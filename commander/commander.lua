@@ -4,6 +4,11 @@ local function get_extension(path)
 	return path:match("%.([^.]+)$")
 end
 
+local function floor(n, places)
+	local factor = 10^(places or 0)
+	return math.floor(n * factor) / factor
+end
+
 local function hex_to_vector4(hex)
 	local hex = hex:match("^#(.+)") or hex
 	local r_hex, g_hex, b_hex = hex:match("(%x%x)(%x%x)(%x%x)")
@@ -15,7 +20,7 @@ local function hex_to_vector4(hex)
 	end
 
 	-- %.3f doesn't actually shorten numbers in Defold's version of Luaj :/
-	return ("vmath.vector4(%.3f, %.3f, %.3f, %.3f)"):format(r, g, b, a or 1)
+	return ("vmath.vector4(%.3f, %.3f, %.3f, %.3f)"):format(floor(r, 3), floor(g, 3), floor(b, 3), floor(a or 1, 3))
 end
 
 M.hex_to_vector4 = {
