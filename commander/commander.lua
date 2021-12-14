@@ -25,8 +25,7 @@ M.hex_to_vector4 = {
 		selection = {type = "resource", cardinality = "one"}
 	},
 	active = function(opts)
-		local extension = get_extension(editor.get(opts.selection, "path"))
-		return extension == "lua" or extension:find("script")
+		return editor.can_set(opts.selection, "text")
 	end,
 	run = function(opts)
 		local text = editor.get(opts.selection, "text")
