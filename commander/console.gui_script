@@ -1,0 +1,145 @@
+local commander = require("commander.commander")
+
+
+local METRICS_SETTINGS = {
+	line_break = true,
+	width = sys.get_config_int("display.width", 960)
+}
+local function message_height(self, message)
+	return resource.get_text_metrics(self.font, message, METRICS_SETTINGS).height
+end
+
+local function is_offscreen(node)
+	return gui.get_position(node).y - gui.get_size(node).y > 640
+end
+
+local function delete_messages(self, at)
+	for i = at,#self.messages do
+		gui.delete_node(self.messages[i])
+		self.messages[i] = nil
+	end
+end
+
+local function shift_messages(self, height)
+	for i, node in ipairs(self.messages) do
+		local pos = gui.get_position(node)
+		local new_pos = pos + vmath.vector3(0, height, 0)
+		gui.set_position(node, new_pos)
+
+		if is_offscreen(node) then
+			delete_messages(self, i)
+			break
+		end
+	end
+end
+
+local function new_message(self, message, color)
+	local height = message_height(self, message)
+	shift_messages(self, height)
+
+	local node = gui.clone(self.message_node)
+	gui.set_position(node, vmath.vector3(0, height, 0))
+	gui.set_text(node, message)
+	gui.set_color(node, color)
+	gui.set_size(node, vmath.vector3(960, height, 0))
+
+	table.insert(self.messages, 1, node)
+end
+
+local function update_prompt(self)
+	gui.set_text(self.prompt_node, "> " .. self.input)
+end
+
+local function split(s)
+	local matches = {}
+	for match in s:gmatch("[^%s]+") do
+		table.insert(matches, match)
+	end
+	return matches
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	commander.register_console(msg.url())
+
+	self.shown = true
+	self.typing = false
+	self.input = ""
+	self.message_node = gui.get_node("message")
+	self.console_node = gui.get_node("console")
+	self.prompt_node = gui.get_node("prompt")
+	self.prompt_bg_node = gui.get_node("prompt_bg")
+	self.font = gui.get_font_resource(gui.get_font(self.message_node))
+	self.messages = {}
+
+	gui.set_enabled(self.console_node, self.shown)
+
+	--commander.run_command(commander.get_command("help"), {"cool stuff"})
+	--commander.info(("AAAAAAAAAA "):rep(110))
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+local COLORS = {
+	[commander.LEVEL_INFO] = vmath.vector4(1, 1, 1, 1),
+	[commander.LEVEL_WARNING] = vmath.vector4(0.8, 0.8, 0.3, 1),
+	[commander.LEVEL_ERROR] = vmath.vector4(0.9, 0.3, 0.3, 1)
+}
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("new_message") then
+		new_message(self, message.text, COLORS[message.level])
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.pressed and not self.typing then
+		if action_id == hash("key_grave") then
+			self.shown = not self.shown
+			gui.set_enabled(self.console_node, self.shown)
+		end
+	end
+
+	if self.shown then
+		if action.pressed and action_id == hash("touch") then
+			local mouse_over = gui.pick_node(self.prompt_node, action.x, action.y)
+			self.typing = mouse_over
+			gui.animate(self.prompt_bg_node, "color.w", self.typing and 0.25 or 0, gui.EASING_INSINE, 0.1)
+		elseif self.typing then
+			if action_id == hash("text") then
+				self.input = self.input .. action.text
+				update_prompt(self)
+			elseif action.pressed then
+				if action_id == hash("key_backspace") then
+					self.input = self.input:sub(1, -2)
+					update_prompt(self)
+				elseif action_id == hash("key_enter") or action_id == hash("key_enter") then
+					local args = split(self.input)
+					local command_name = table.remove(args, 1)
+					commander.run_command(command_name, args)
+					self.input = ""
+					update_prompt(self)
+				end
+			end
+		end
+	end
+
+	return self.typing
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Learn more: https://defold.com/manuals/hot-reload/
+	-- Remove this function if not needed
+end

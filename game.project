@@ -12,5 +12,8 @@ height = 640
 input_method = HiddenInputField
 
 [project]
-title = defold-commander
+title = Commander
+
+[input]
+game_binding = /builtins/input/all.input_bindingc
 
