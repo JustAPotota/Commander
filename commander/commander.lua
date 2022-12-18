@@ -131,6 +131,7 @@ end
 function M.register_console(url)
 	table.insert(CONSOLES, url)
 	M.info("Registered new console " .. tostring(url))
+	M.info("Type 'help' to view all available commands")
 end
 
 return M
