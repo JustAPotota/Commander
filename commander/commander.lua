@@ -134,4 +134,9 @@ function M.register_console(url)
 	M.info("Type 'help' to view all available commands")
 end
 
+if sys.get_config_int("commander.override_builtins", 0) ~= 0 then
+	print = M.info
+	error = M.error
+end
+
 return M

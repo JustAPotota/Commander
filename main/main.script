@@ -4,6 +4,8 @@ function init(self)
 	msg.post(".", "acquire_input_focus")
 
 	--commander.run_command(commander.get_command("help"), {})
+	print(":")
+	error("oh no")
 end
 
 function final(self)

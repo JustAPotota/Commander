@@ -17,3 +17,6 @@ title = Commander
 [input]
 game_binding = /builtins/input/all.input_bindingc
 
+[commander]
+override_builtins = 0
+
