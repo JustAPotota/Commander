@@ -14,6 +14,7 @@ local TYPE_MAP = {
 	number = M.ARG_NUMBER
 }
 
+M.LEVEL_DEBUG = 0
 M.LEVEL_INFO = 1
 M.LEVEL_WARNING = 2
 M.LEVEL_ERROR = 3
@@ -72,11 +73,7 @@ local function broadcast(message)
 	end
 end
 
-function M.error(text)
-	local message = {
-		text = text,
-		level = M.LEVEL_ERROR
-	}
+local function broadcast_or_hold(message)
 	if #CONSOLES > 0 then
 		broadcast(message)
 	else
@@ -84,16 +81,36 @@ function M.error(text)
 	end
 end
 
+function M.debug(text)
+	local message = {
+		text = text,
+		level = M.LEVEL_DEBUG
+	}
+	broadcast_or_hold(message)
+end
+
 function M.info(text)
 	local message = {
 		text = text,
 		level = M.LEVEL_INFO
 	}
-	if #CONSOLES > 0 then
-		broadcast(message)
-	else
-		table.insert(BACKLOG, message)
-	end
+	broadcast_or_hold(message)
+end
+
+function M.warning(text)
+	local message = {
+		text = text,
+		level = M.LEVEL_WARNING
+	}
+	broadcast_or_hold(message)
+end
+
+function M.error(text)
+	local message = {
+		text = text,
+		level = M.LEVEL_ERROR
+	}
+	broadcast_or_hold(message)
 end
 
 function M.get_command(name)
@@ -134,9 +151,26 @@ function M.register_console(url)
 	M.info("Type 'help' to view all available commands")
 end
 
-if sys.get_config_int("commander.override_builtins", 0) ~= 0 then
-	print = M.info
-	error = M.error
+local function ext_debug(_, domain, message)
+	M.debug(message)
+end
+
+local function ext_info(_, domain, message)
+	M.info(message)
+end
+
+local function ext_warning(_, domain, message)
+	M.warning(message)
+end
+
+local function ext_error(_, domain, message)
+	M.error(message)
+end
+
+function M.init()
+	if sys.get_config_int("commander.capture_logs", 1) ~= 0 then
+		commander_ext.set_listeners(ext_debug, ext_info, ext_warning, ext_error)
+	end
 end
 
 return M

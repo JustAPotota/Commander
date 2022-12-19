@@ -18,5 +18,5 @@ title = Commander
 game_binding = /builtins/input/all.input_bindingc
 
 [commander]
-override_builtins = 0
+capture_logs = 1
 

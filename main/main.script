@@ -3,7 +3,8 @@ local commander = require("commander.commander")
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
-	--commander.run_command(commander.get_command("help"), {})
+	commander.init()
+
 	print(":")
 	error("oh no")
 end
