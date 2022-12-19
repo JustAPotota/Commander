@@ -1,17 +1,17 @@
 local M = {}
 
-M.ARG_STRING = {
+M.TYPE_STRING = {
 	name = "a string"
 }
-M.ARG_NUMBER = {
+M.TYPE_NUMBER = {
 	name = "a number"
 }
-M.ARG_NIL = {
+M.TYPE_NIL = {
 	name = "nil"
 }
 local TYPE_MAP = {
-	string = M.ARG_STRING,
-	number = M.ARG_NUMBER
+	string = M.TYPE_STRING,
+	number = M.TYPE_NUMBER
 }
 
 M.LEVEL_DEBUG = 0
@@ -28,7 +28,7 @@ M.commands = {
 		aliases = {},
 		description = "List available commands",
 		arguments = {
-			--M.ARG_STRING
+			--M.TYPE_STRING
 		},
 		run = function(args)
 			M.info("Available commands:")
@@ -46,14 +46,14 @@ M.commands = {
 
 local function arg_type(arg)
 	local type = type(arg)
-	return TYPE_MAP[type] or M.ARG_NIL
+	return TYPE_MAP[type] or M.TYPE_NIL
 end
 
 local function check_args(command, args)
 	for i, expected in ipairs(command.arguments) do
 		local given = arg_type(args[i])
 		if given ~= expected then
-			if expected == M.ARG_NUMBER and given == M.ARG_STRING then
+			if expected == M.TYPE_NUMBER and given == M.TYPE_STRING then
 				args[i] = tonumber(args[i])
 				if not args[i] then
 					return false, ("Argument #%i must be %s, not %s"):format(i, expected.name, given.name)
