@@ -16,6 +16,7 @@ title = Commander
 
 [input]
 game_binding = /builtins/input/all.input_bindingc
+repeat_interval = 0.02
 
 [commander]
 capture_logs = 1
