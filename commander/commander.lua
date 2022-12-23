@@ -49,10 +49,17 @@ function M.TYPE_ANY_OF(...)
 	}
 end
 
-M.LEVEL_DEBUG = 0
-M.LEVEL_INFO = 1
-M.LEVEL_WARNING = 2
-M.LEVEL_ERROR = 3
+---@class Message
+---@field text string
+---@field severit Severity
+
+---@enum Severity
+M.SEVERITY = {
+	DEBUG = 0,
+	INFO = 1,
+	WARNING = 2,
+	ERROR = 3
+}
 
 local CONSOLES = {}
 local BACKLOG = {}
@@ -146,12 +153,14 @@ local function check_args(command, args)
 	return true
 end
 
+---@param message Message
 local function broadcast(message)
 	for _, console in ipairs(CONSOLES) do
 		msg.post(console, "new_message", message)
 	end
 end
 
+---@param message Message
 local function broadcast_or_hold(message)
 	if #CONSOLES > 0 then
 		broadcast(message)
@@ -160,34 +169,38 @@ local function broadcast_or_hold(message)
 	end
 end
 
+---@param text string
 function M.debug(text)
 	local message = {
 		text = text,
-		level = M.LEVEL_DEBUG
+		severity = M.SEVERITY.DEBUG
 	}
 	broadcast_or_hold(message)
 end
 
+---@param text string
 function M.info(text)
 	local message = {
 		text = text,
-		level = M.LEVEL_INFO
+		severity = M.SEVERITY.INFO
 	}
 	broadcast_or_hold(message)
 end
 
+---@param text string
 function M.warning(text)
 	local message = {
 		text = text,
-		level = M.LEVEL_WARNING
+		severity = M.SEVERITY.WARNING
 	}
 	broadcast_or_hold(message)
 end
 
+---@param text string
 function M.error(text)
 	local message = {
 		text = text,
-		level = M.LEVEL_ERROR
+		severity = M.SEVERITY.ERROR
 	}
 	broadcast_or_hold(message)
 end

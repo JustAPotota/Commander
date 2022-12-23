@@ -13,7 +13,7 @@ local function is_offscreen(node)
 end
 
 local function delete_messages(self, at)
-	for i = at,#self.messages do
+	for i = at, #self.messages do
 		gui.delete_node(self.messages[i])
 		self.messages[i] = nil
 	end
@@ -94,15 +94,15 @@ function update(self, dt)
 end
 
 local COLORS = {
-	[commander.LEVEL_DEBUG] = vmath.vector4(0.2, 0.6, 0.9, 1),
-	[commander.LEVEL_INFO] = vmath.vector4(1, 1, 1, 1),
-	[commander.LEVEL_WARNING] = vmath.vector4(0.8, 0.8, 0.3, 1),
-	[commander.LEVEL_ERROR] = vmath.vector4(0.9, 0.3, 0.3, 1)
+	[commander.SEVERITY.DEBUG] = vmath.vector4(0.2, 0.6, 0.9, 1),
+	[commander.SEVERITY.INFO] = vmath.vector4(1, 1, 1, 1),
+	[commander.SEVERITY.WARNING] = vmath.vector4(0.8, 0.8, 0.3, 1),
+	[commander.SEVERITY.ERROR] = vmath.vector4(0.9, 0.3, 0.3, 1)
 }
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("new_message") then
-		new_message(self, message.text, COLORS[message.level])
+		new_message(self, message.text, COLORS[message.severity])
 	end
 end
 
