@@ -1,5 +1,10 @@
 local M = {}
 
+---@class Argument
+---@field name string
+---@field any_of boolean?
+---@field types Argument[]?
+
 M.TYPE_STRING = {
 	name = "a string"
 }
@@ -14,8 +19,9 @@ local TYPE_MAP = {
 	number = M.TYPE_NUMBER
 }
 
+---@param ... Argument
 function M.TYPE_ANY_OF(...)
-	local types = {...}
+	local types = { ... }
 
 	if #types == 0 then
 		return M.TYPE_NIL
@@ -51,6 +57,13 @@ M.LEVEL_ERROR = 3
 local CONSOLES = {}
 local BACKLOG = {}
 
+---@class Command
+---@field name string
+---@field aliases string[]
+---@field description string
+---@field arguments Argument[]
+---@field run function(args: any[])
+
 M.commands = {
 	{
 		name = "help",
@@ -73,11 +86,16 @@ M.commands = {
 	}
 }
 
+---@param arg any
+---@return Argument
 local function arg_type(arg)
 	local type = type(arg)
 	return TYPE_MAP[type] or M.TYPE_NIL
 end
 
+---@param expected Argument
+---@param arg any
+---@return boolean,any?
 local function arg_matches(expected, arg)
 	local given = arg_type(arg)
 
@@ -101,6 +119,9 @@ local function arg_matches(expected, arg)
 	return false
 end
 
+---@param command Command
+---@param args any[]
+---@returns boolean
 local function check_args(command, args)
 	for i, expected in ipairs(command.arguments) do
 		local given = arg_type(args[i])
@@ -161,6 +182,8 @@ function M.error(text)
 	broadcast_or_hold(message)
 end
 
+---@param name string
+---@return Command?
 function M.get_command(name)
 	for _, command in ipairs(M.commands) do
 		if name == command.name then return command end
@@ -170,6 +193,8 @@ function M.get_command(name)
 	end
 end
 
+---@param command Command
+---@param args any[]
 function M.run_command(command, args)
 	if type(command) == "string" then
 		local maybe_command = M.get_command(command)
