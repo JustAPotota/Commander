@@ -14,6 +14,35 @@ local TYPE_MAP = {
 	number = M.TYPE_NUMBER
 }
 
+function M.TYPE_ANY_OF(...)
+	local types = {...}
+
+	if #types == 0 then
+		return M.TYPE_NIL
+	elseif #types == 1 then
+		return types[1]
+	end
+
+	local name = ""
+	if #types == 2 then
+		name = ("either %s or %s"):format(types[1].name, types[2].name)
+	else
+		for i, t in ipairs(types) do
+			if i == #types then
+				name = name .. "or " .. t.name
+			else
+				name = name .. t.name .. ", "
+			end
+		end
+	end
+
+	return {
+		any_of = true,
+		types = types,
+		name = name
+	}
+end
+
 M.LEVEL_DEBUG = 0
 M.LEVEL_INFO = 1
 M.LEVEL_WARNING = 2
@@ -28,7 +57,7 @@ M.commands = {
 		aliases = {},
 		description = "List available commands",
 		arguments = {
-			--M.TYPE_STRING
+			M.TYPE_ANY_OF(M.TYPE_STRING, M.TYPE_NUMBER)
 		},
 		run = function(args)
 			M.info("Available commands:")
@@ -37,7 +66,7 @@ M.commands = {
 				if #command.aliases > 0 then
 					name = name .. ", " .. table.concat(command.aliases, ", ")
 				end
-				
+
 				M.info("    " .. name .. " - " .. command.description)
 			end
 		end
@@ -49,18 +78,37 @@ local function arg_type(arg)
 	return TYPE_MAP[type] or M.TYPE_NIL
 end
 
+local function arg_matches(expected, arg)
+	local given = arg_type(arg)
+
+	if given == expected then return true end
+
+	if expected.any_of then
+		for _, t in ipairs(expected.types) do
+			if arg_matches(t, arg) then
+				return true
+			end
+		end
+	end
+
+	if expected == M.TYPE_NUMBER and given == M.TYPE_STRING then
+		local str = tostring(arg)
+		if str then
+			return true, str
+		end
+	end
+
+	return false
+end
+
 local function check_args(command, args)
 	for i, expected in ipairs(command.arguments) do
 		local given = arg_type(args[i])
-		if given ~= expected then
-			if expected == M.TYPE_NUMBER and given == M.TYPE_STRING then
-				args[i] = tonumber(args[i])
-				if not args[i] then
-					return false, ("Argument #%i must be %s, not %s"):format(i, expected.name, given.name)
-				end
-			else
-				return false, ("Argument #%i must be %s, not %s"):format(i, expected.name, given.name)
-			end
+		local ok, cast_arg = arg_matches(expected, args[i])
+		if not ok then
+			return false, ("Argument #%i must be %s, not %s"):format(i, expected.name, given.name)
+		elseif cast_arg then
+			args[i] = cast_arg
 		end
 	end
 
