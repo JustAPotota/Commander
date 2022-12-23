@@ -64,13 +64,14 @@ local BACKLOG = {}
 ---@field arguments Argument[]
 ---@field run function(args: any[])
 
+---@type Command[]
 M.commands = {
 	{
 		name = "help",
 		aliases = {},
 		description = "List available commands",
 		arguments = {
-			M.TYPE_ANY_OF(M.TYPE_STRING, M.TYPE_NUMBER)
+			--M.TYPE_ANY_OF(M.TYPE_STRING, M.TYPE_NUMBER)
 		},
 		run = function(args)
 			M.info("Available commands:")
@@ -82,6 +83,15 @@ M.commands = {
 
 				M.info("    " .. name .. " - " .. command.description)
 			end
+		end
+	},
+	{
+		name = "exit",
+		aliases = { "quit" },
+		description = "Exit the game",
+		arguments = {},
+		run = function(args)
+			sys.exit(1)
 		end
 	}
 }
