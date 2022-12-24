@@ -5,8 +5,6 @@ function init(self)
 
 	commander.init()
 
-	commander.TYPE_ANY_OF(commander.TYPE_STRING, commander.TYPE_NIL)
-
 	print(":")
 	error("oh no")
 end
