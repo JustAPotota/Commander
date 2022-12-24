@@ -100,6 +100,19 @@ M.commands = {
 		run = function(args)
 			sys.exit(1)
 		end
+	},
+	{
+		name = "lua",
+		aliases = { "run" },
+		description = "Run the given Lua code",
+		arguments = {
+			M.TYPE_STRING
+		},
+		run = function(args)
+			local code = table.concat(args, " ")
+			local func = assert(loadstring(code))
+			func()
+		end
 	}
 }
 
