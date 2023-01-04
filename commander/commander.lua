@@ -222,6 +222,12 @@ local function broadcast_or_hold(message)
 	end
 end
 
+---@param message string
+---@return string
+local function traceback(message)
+  return debug.traceback(message, 2):gsub("\n\t", "\n  ")
+end
+
 ---@param text string
 function M.debug(text)
 	local message = {
@@ -250,9 +256,10 @@ function M.warning(text)
 end
 
 ---@param text string
-function M.error(text)
+---@param disable_traceback boolean
+function M.error(text, disable_traceback)
 	local message = {
-		text = text .. "\n" .. debug.traceback(),
+		text = disable_traceback and text or traceback(text),
 		severity = M.SEVERITY.ERROR
 	}
 	broadcast_or_hold(message)
@@ -398,7 +405,7 @@ local function ext_warning(_, domain, message)
 end
 
 local function ext_error(_, domain, message)
-	M.error(message)
+	M.error(message, true)
 end
 
 function M.init()
