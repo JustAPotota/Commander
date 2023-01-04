@@ -369,7 +369,7 @@ function M.run_command(command, args)
 
       local inspector = find_valid_inspector(url)
       if not inspector then
-        return M.error("No inspector found in socket " .. tostring(url.socket))
+        return M.error("No inspector found in socket with " .. tostring(url.socket))
       end
 
       msg.post(inspector, "run_command", { command = command_name, args = args })
@@ -383,13 +383,13 @@ end
 
 function M.register_console(url)
 	table.insert(CONSOLES, url)
-	M.info("Registered new console " .. tostring(url))
+	M.info("Registered new console with " .. tostring(url))
 	M.info("Type 'help' to view all available commands")
 end
 
 function M.register_inspector(url)
 	table.insert(INSPECTORS, url)
-	M.info("Registered new inspector " .. tostring(url))
+	M.info("Registered new inspector with " .. tostring(url))
 end
 
 local function ext_debug(_, domain, message)

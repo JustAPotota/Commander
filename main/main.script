@@ -5,7 +5,7 @@ function init(self)
 
 	commander.init()
 
-	print(":")
+	print("test print")
 	error("oh no")
 end
 
