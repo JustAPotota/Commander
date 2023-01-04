@@ -8,7 +8,7 @@
 # - MacOS: "/Applications/Defold.app"
 # - Linux: "/usr/bin/Defold"
 # - Windows: "C:/Program Files/Defold"
-defold_editor_path="YOUR-DEFOLD-PATH-HERE"
+defold_editor_path="/home/potota/.steam/steam/steamapps/common/Defold"
 
 # Open the output folder after completing the bundle.
 open_bundle_folder=true

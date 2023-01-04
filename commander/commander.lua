@@ -1,5 +1,7 @@
 local M = {}
 
+M.MESSAGE_RUN_COMMAND = hash("run_command")
+
 ---@class Argument
 ---@field name string
 ---@field any_of boolean?
@@ -14,9 +16,12 @@ M.TYPE_NUMBER = {
 M.TYPE_NIL = {
 	name = "nil"
 }
+M.TYPE_URL = {
+	name = "a URL"
+}
 local TYPE_MAP = {
 	string = M.TYPE_STRING,
-	number = M.TYPE_NUMBER
+	number = M.TYPE_NUMBER,
 }
 
 ---@param ... Argument
@@ -51,7 +56,7 @@ end
 
 ---@class Message
 ---@field text string
----@field severit Severity
+---@field severity Severity
 
 ---@enum Severity
 M.SEVERITY = {
@@ -62,6 +67,7 @@ M.SEVERITY = {
 }
 
 local CONSOLES = {}
+local INSPECTORS = {}
 local BACKLOG = {}
 
 ---@class Command
@@ -113,14 +119,43 @@ M.commands = {
 			local func = assert(loadstring(code))
 			func()
 		end
+	},
+	{
+		name = "get_pos",
+		aliases = {},
+		description = "Print the position of the given game object",
+		arguments = {
+			M.TYPE_URL
+		},
+		run = function(args)
+      M.info(tostring(go.get_position(args[1])))
+		end
 	}
 }
+
+---@param value any
+---@return boolean
+local function is_url(value)
+  assert(value.socket ~= nil)
+  return true
+end
 
 ---@param arg any
 ---@return Argument
 local function arg_type(arg)
-	local type = type(arg)
-	return TYPE_MAP[type] or M.TYPE_NIL
+	local type_name = type(arg)
+
+  if type_name == "string" then
+    return M.TYPE_STRING
+  elseif type_name == "number" then
+    return M.TYPE_NUMBER
+  elseif type_name == "userdata" then
+    if pcall(is_url, arg) then
+      return M.TYPE_URL
+    end
+  end
+
+	return M.TYPE_NIL
 end
 
 ---@param expected Argument
@@ -143,6 +178,11 @@ local function arg_matches(expected, arg)
 		local str = tostring(arg)
 		if str then
 			return true, str
+		end
+	elseif expected == M.TYPE_URL and given == M.TYPE_STRING then
+		local ok, url = pcall(msg.url, arg)
+		if ok then
+			return true, url
 		end
 	end
 
@@ -212,10 +252,55 @@ end
 ---@param text string
 function M.error(text)
 	local message = {
-		text = text,
+		text = text .. "\n" .. debug.traceback(),
 		severity = M.SEVERITY.ERROR
 	}
 	broadcast_or_hold(message)
+end
+
+---@param arguments Argument[]
+---@param arg_type Argument
+---@return boolean
+local function has_arg_type(arguments, arg_type)
+	for _, arg in ipairs(arguments) do
+		if arg == arg_type then
+			return true
+		elseif arg.types then
+			return has_arg_type(arg.types, arg_type)
+		end
+	end
+end
+
+---@param command Command
+---@return boolean
+local function requires_inspector(command)
+	return has_arg_type(command.arguments, M.TYPE_URL)
+end
+
+---@param args any[]
+---@return url[]
+local function get_urls(args)
+  local urls = {}
+  for _, v in ipairs(args) do
+    if type(v) == "userdata" and v.socket then
+      table.insert(urls, v)
+    end
+  end
+  return urls
+end
+
+---@param urls url[]
+---@return boolean
+local function has_multiple_sockets(urls)
+  local current_socket
+  for _, url in ipairs(urls) do
+    if current_socket and url.socket ~= current_socket then
+      return true
+    end
+    current_socket = url.socket
+  end
+
+  return false
 end
 
 ---@param name string
@@ -229,9 +314,24 @@ function M.get_command(name)
 	end
 end
 
----@param command Command
+---@param url url
+---@return url?
+local function find_valid_inspector(url)
+	for _, inspector in ipairs(INSPECTORS) do
+		if url.socket == inspector.socket then
+			return inspector
+		end
+	end
+end
+
+local function is_go()
+  return pcall(go.get_id)
+end
+
+---@param command Command|string
 ---@param args any[]
 function M.run_command(command, args)
+  local command_name = command
 	if type(command) == "string" then
 		local maybe_command = M.get_command(command)
 		if maybe_command then
@@ -244,11 +344,31 @@ function M.run_command(command, args)
 	if type(command) ~= "table" then
 		return M.error("Command must be a table or a string, not " .. arg_type(command).name)
 	end
-
+  
 	local ok, err = check_args(command, args)
 
 	if ok then
-		command.run(args)
+    if requires_inspector(command) then
+      local urls = get_urls(args)
+      if #urls == 0 then return command.run(args) end
+      if has_multiple_sockets(urls) then
+        return M.error("Cannot run a command on multiple sockets")
+      end
+
+      local url = urls[1]
+      if url.socket == msg.url().socket and is_go() then
+        return command.run(args)
+      end
+
+      local inspector = find_valid_inspector(url)
+      if not inspector then
+        return M.error("No inspector found in socket " .. tostring(url.socket))
+      end
+
+      msg.post(inspector, "run_command", { command = command_name, args = args })
+    else
+		  command.run(args)
+    end
 	else
 		M.error(err)
 	end
@@ -258,6 +378,11 @@ function M.register_console(url)
 	table.insert(CONSOLES, url)
 	M.info("Registered new console " .. tostring(url))
 	M.info("Type 'help' to view all available commands")
+end
+
+function M.register_inspector(url)
+	table.insert(INSPECTORS, url)
+	M.info("Registered new inspector " .. tostring(url))
 end
 
 local function ext_debug(_, domain, message)

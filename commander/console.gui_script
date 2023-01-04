@@ -81,7 +81,9 @@ end
 
 local function insert_text(self, text)
 	local new_input = self.input:sub(1, self.cursor_index) .. text .. self.input:sub(self.cursor_index + 1, -1)
-	self.cursor_index = self.cursor_index + #text
+	if self.cursor_index < #self.input-1 then
+		self.cursor_index = self.cursor_index + #text
+	end
 	set_input(self, new_input)
 end
 
