@@ -44,6 +44,24 @@ function sys.get_config(key) end
 ---@return string config value as a string. default_value if the config key does not exist
 function sys.get_config(key, default_value) end
 
+---Get string config value from the game.project configuration file with optional default value
+---@param key string
+---@param default_value string
+---@return string
+function sys.get_config_string(key, default_value) end
+
+---Get integer config value from the game.project configuration file with optional default value
+---@param key string
+---@param default_value number
+---@return string
+function sys.get_config_int(key, default_value) end
+
+---Get number config value from the game.project configuration file with optional default value
+---@param key string
+---@param default_value number
+---@return string
+function sys.get_config_number(key, default_value) end
+
 --- Returns the current network connectivity status
 ---on mobile platforms.
 ---On desktop, this function always return sys.NETWORK_CONNECTED.

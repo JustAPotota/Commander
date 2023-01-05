@@ -208,7 +208,7 @@ gui.SIZE_MODE_MANUAL = nil
 ---together. See the examples below for more information.
 ---@param node node node to animate
 ---@param property string|constant property to animate
----@param to vector3|vector4 target property value
+---@param to vector3|vector4|number target property value
 ---@param easing constant|vector easing to use during animation.      Either specify one of the gui.EASING_* constants or provide a      vector with a custom curve. See the animation guide <> for more information.
 ---@param duration number duration of the animation in seconds.
 ---@param delay number delay before the animation starts in seconds.

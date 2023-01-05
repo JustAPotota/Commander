@@ -58,7 +58,7 @@ end
 
 ---@class Message
 ---@field text string
----@field domain string
+---@field domain string?
 ---@field severity Severity
 
 ---@enum Severity
@@ -226,7 +226,7 @@ local function broadcast_or_hold(message)
 end
 
 ---@param message string
----@return string
+---@return string, number
 local function traceback(message)
   return debug.traceback(message, 2):gsub("\n\t", "\n  ")
 end
@@ -241,26 +241,26 @@ local function new_message(text, domain, severity)
 end
 
 ---@param text string
----@param domain string
+---@param domain string?
 function M.debug(text, domain)
   new_message(text, domain, M.SEVERITY.DEBUG)
 end
 
 ---@param text string
----@param domain string
+---@param domain string?
 function M.info(text, domain)
   new_message(text, domain, M.SEVERITY.INFO)
 end
 
 ---@param text string
----@param domain string
+---@param domain string?
 function M.warning(text, domain)
   new_message(text, domain, M.SEVERITY.WARNING)
 end
 
 ---@param text string
----@param domain string
----@param disable_traceback boolean
+---@param domain string?
+---@param disable_traceback boolean?
 function M.error(text, domain, disable_traceback)
   local text = disable_traceback and text or traceback(text)
   new_message(text, domain, M.SEVERITY.ERROR)
@@ -277,6 +277,7 @@ local function has_arg_type(arguments, arg_type)
 			return has_arg_type(arg.types, arg_type)
 		end
 	end
+  return false
 end
 
 ---@param command Command

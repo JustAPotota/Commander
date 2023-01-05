@@ -1,11 +1,10 @@
-{   
+{
     // Editor
     "editor.suggest.localityBonus": true,
     "editor.suggestSelection": "recentlyUsedByPrefix",
     "editor.suggest.shareSuggestSelections": true,
     "editor.suggest.showWords": false,
     "vscode-lua-format.configPath": ".vscode/lua-format.config",
-    
     // Lua tab size
     "[lua]": {
         "editor.defaultFormatter": "Koihik.vscode-lua-format",
@@ -33,7 +32,6 @@
         "editor.insertSpaces": true,
         "editor.detectIndentation": false,
     },
-
     // Files
     "files.associations": {
         "*.project": "ini",
@@ -76,7 +74,6 @@
         ".fp": "frag",
         ".vp": "vert"
     },
-
     // Lua Language Server
     "Lua.runtime.version": "Lua 5.1",
     "Lua.intelliSense.searchDepth": 10,
@@ -103,7 +100,8 @@
         "spine",
         "sprite",
         "json",
-        "window"
+        "window",
+        "commander_ext"
     ],
     "Lua.diagnostics.disable": [
         "lowercase-global",
@@ -120,5 +118,4 @@
         ".internal",
         ".defold_api"
     ],
-    
 }
