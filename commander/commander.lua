@@ -335,6 +335,13 @@ local function is_go()
   return pcall(go.get_id)
 end
 
+local function run_command(command, args)
+  local ok, message = pcall(command.run, args)
+  if not ok then
+    M.error(message)
+  end
+end
+
 ---@param command Command|string
 ---@param args any[]
 function M.run_command(command, args)
@@ -357,14 +364,14 @@ function M.run_command(command, args)
 	if ok then
     if requires_inspector(command) then
       local urls = get_urls(args)
-      if #urls == 0 then return command.run(args) end
+      if #urls == 0 then return run_command(command, args) end
       if has_multiple_sockets(urls) then
         return M.error("Cannot run a command on multiple sockets")
       end
 
       local url = urls[1]
       if url.socket == msg.url().socket and is_go() then
-        return command.run(args)
+        return run_command(command, args)
       end
 
       local inspector = find_valid_inspector(url)
@@ -374,7 +381,7 @@ function M.run_command(command, args)
 
       msg.post(inspector, "run_command", { command = command_name, args = args })
     else
-		  command.run(args)
+      run_command(command, args)
     end
 	else
 		M.error(err)
@@ -395,6 +402,18 @@ end
 function M.register_inspector(url)
 	table.insert(INSPECTORS, url)
 	M.info("Registered new inspector with " .. tostring(url))
+end
+
+---@param command Command
+function M.register_command(command)
+  table.insert(M.commands, command)
+end
+
+---@param commands Command[]
+function M.register_commands(commands)
+  for _, command in ipairs(commands) do
+    table.insert(M.commands, command)
+  end
 end
 
 local function ext_debug(_, domain, message)

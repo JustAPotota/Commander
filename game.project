@@ -13,6 +13,7 @@ input_method = HiddenInputField
 
 [project]
 title = Commander
+dependencies#0 = https://github.com/britzl/monarch/archive/refs/tags/3.7.0.zip
 
 [input]
 game_binding = /builtins/input/all.input_bindingc
