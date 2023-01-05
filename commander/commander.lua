@@ -91,13 +91,6 @@ local function has_arg_type(arguments, arg_type)
   return false
 end
 
----@param arg_type Argument
----@return boolean
-local function is_optional(arg_type)
-  return arg_type.any_of and has_arg_type(arg_type, M.TYPE_NIL) or arg_type == M.TYPE_NIL
-end
-
-
 ---@class Message
 ---@field text string
 ---@field domain string?
@@ -128,76 +121,6 @@ local BACKLOG = {}
 
 ---@type CommandSet[]
 M.commands = {}
-
-local builtin_commands = {
-  {
-		name = "help",
-		aliases = {},
-		description = "List available commands",
-		arguments = {},
-		run = function(args)
-			M.info("Available commands:")
-      for _, set in ipairs(M.commands) do
-        M.info(set.domain)
-        for _, command in ipairs(set.commands) do
-          local name = command.name
-          if #command.aliases > 0 then
-            name = name .. ", " .. table.concat(command.aliases, ", ")
-          end
-
-          local args = ""
-          for _, arg_type in ipairs(command.arguments) do
-            local arg = " "
-            if arg_type.optional then
-              arg = arg .. ("[%s]"):format(arg_type.name)
-            else
-              arg = arg .. ("<%s>"):format(arg_type.name)
-            end
-            args = args .. arg
-          end
-
-          local full_name = name .. args
-          full_name = full_name .. (" "):rep(25 - #full_name)
-  
-          M.info("    " .. full_name .. " - " .. command.description)
-        end
-      end
-		end
-	},
-	{
-		name = "exit",
-		aliases = { "quit" },
-		description = "Exit the game",
-		arguments = {},
-		run = function(args)
-			sys.exit(1)
-		end
-	},
-	{
-		name = "lua",
-		aliases = { "run" },
-		description = "Run the given Lua code",
-		arguments = {
-			M.TYPE_STRING
-		},
-		run = function(args)
-			local code = table.concat(args, " ")
-			local func = assert(loadstring(code))
-			func()
-		end
-	},
-	{
-		name = "get_pos",
-		aliases = {},
-		description = "Print the position of the given game object",
-		arguments = {
-			M.TYPE_URL
-		},
-		run = function(args)
-      M.info(tostring(go.get_position(args[1])))
-		end
-	}
-}
 
 ---@param value any
 ---@return boolean
@@ -483,7 +406,7 @@ function M.register_commands(commands, domain)
     table.insert(M.commands, new_set)
   end
 end
-M.register_commands(builtin_commands, "Commander")
+M.register_commands(require("commander.commands"), "Commander")
 
 local function ext_debug(_, domain, message)
 	M.debug(message, domain)

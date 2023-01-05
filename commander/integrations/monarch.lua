@@ -8,8 +8,6 @@ else
   commander.info("Adding Monarch integration", "COMMANDER")
 end
 
-local M = {}
-
 ---@type Command[]
 local commands = {
   {
@@ -58,5 +56,3 @@ local commands = {
 }
 
 commander.register_commands(commands, "Monarch")
-
-return M
