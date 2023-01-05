@@ -1,5 +1,7 @@
 local M = {}
 
+local COMMANDER = "COMMANDER"
+
 M.MESSAGE_RUN_COMMAND = hash("run_command")
 
 ---@class Argument
@@ -239,21 +241,25 @@ local function new_message(text, domain, severity)
 end
 
 ---@param text string
+---@param domain string
 function M.debug(text, domain)
   new_message(text, domain, M.SEVERITY.DEBUG)
 end
 
 ---@param text string
+---@param domain string
 function M.info(text, domain)
   new_message(text, domain, M.SEVERITY.INFO)
 end
 
 ---@param text string
+---@param domain string
 function M.warning(text, domain)
   new_message(text, domain, M.SEVERITY.WARNING)
 end
 
 ---@param text string
+---@param domain string
 ---@param disable_traceback boolean
 function M.error(text, domain, disable_traceback)
   local text = disable_traceback and text or traceback(text)
@@ -333,7 +339,7 @@ end
 local function run_command(command, args)
   local ok, message = pcall(command.run, args)
   if not ok then
-    M.error(message)
+    M.error(message, COMMANDER)
   end
 end
 
@@ -346,12 +352,12 @@ function M.run_command(command, args)
 		if maybe_command then
 			command = maybe_command
 		else
-			return M.error("Unknown command '" .. command .. "'")
+			return M.error("Unknown command '" .. command .. "'", COMMANDER)
 		end
 	end
 
 	if type(command) ~= "table" then
-		return M.error("Command must be a table or a string, not " .. arg_type(command).name)
+		return M.error("Command must be a table or a string, not " .. arg_type(command).name, COMMANDER)
 	end
   
 	local ok, err = check_args(command, args)
@@ -361,7 +367,7 @@ function M.run_command(command, args)
       local urls = get_urls(args)
       if #urls == 0 then return run_command(command, args) end
       if has_multiple_sockets(urls) then
-        return M.error("Cannot run a command on multiple sockets")
+        return M.error("Cannot run a command on multiple sockets", COMMANDER)
       end
 
       local url = urls[1]
@@ -371,7 +377,7 @@ function M.run_command(command, args)
 
       local inspector = find_valid_inspector(url)
       if not inspector then
-        return M.error("No inspector found in socket with " .. tostring(url.socket))
+        return M.error("No inspector found in socket with " .. tostring(url.socket), COMMANDER)
       end
 
       msg.post(inspector, "run_command", { command = command_name, args = args })
@@ -379,14 +385,14 @@ function M.run_command(command, args)
       run_command(command, args)
     end
 	else
-		M.error(err)
+		M.error(err, COMMANDER)
 	end
 end
 
 function M.register_console(url)
 	table.insert(CONSOLES, url)
-	M.info("Registered new console with " .. tostring(url))
-	M.info("Type 'help' to view all available commands")
+	M.info("Registered new console with " .. tostring(url), COMMANDER)
+	M.info("Type 'help' to view all available commands", COMMANDER)
 
   for i = 1, #BACKLOG do
     broadcast(BACKLOG[i])
@@ -396,7 +402,7 @@ end
 
 function M.register_inspector(url)
 	table.insert(INSPECTORS, url)
-	M.info("Registered new inspector with " .. tostring(url))
+	M.info("Registered new inspector with " .. tostring(url), COMMANDER)
 end
 
 ---@param command Command
@@ -412,19 +418,19 @@ function M.register_commands(commands)
 end
 
 local function ext_debug(_, domain, message)
-	M.debug(message)
+	M.debug(message, domain)
 end
 
 local function ext_info(_, domain, message)
-	M.info(message)
+	M.info(message, domain)
 end
 
 local function ext_warning(_, domain, message)
-	M.warning(message)
+	M.warning(message, domain)
 end
 
 local function ext_error(_, domain, message)
-	M.error(message, nil, true)
+	M.error(message, domain, true)
 end
 
 function M.init()

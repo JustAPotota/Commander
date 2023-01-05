@@ -2,10 +2,10 @@ local commander = require("commander.commander")
 local _, monarch = pcall(require, "monarch.monarch")
 
 if type(monarch) ~= "table" then
-  commander.info("Monarch not found, skipping integration")
+  commander.info("Monarch not found, skipping integration", "COMMANDER")
   return
 else
-  commander.info("Adding Monarch integration")
+  commander.info("Adding Monarch integration", "COMMANDER")
 end
 
 local M = {}

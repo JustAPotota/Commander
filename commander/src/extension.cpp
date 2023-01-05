@@ -44,7 +44,7 @@ static void LuaInit(lua_State *L)
     assert(top == lua_gettop(L));
 }
 
-static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const char *message)
+static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const char *message, size_t severity_length)
 {
     if (!dmScript::IsCallbackValid(cb))
         return;
@@ -58,7 +58,7 @@ static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const
     }
 
     lua_pushstring(L, domain);
-    lua_pushstring(L, message);
+    lua_pushstring(L, message + strlen(domain) + severity_length + 3);
 
     dmScript::PCall(L, 3, 0);
     dmScript::TeardownCallback(cb);
@@ -68,13 +68,13 @@ static void LogListener(LogSeverity severity, const char *domain, const char *me
 {
     if (severity <= LOG_SEVERITY_USER_DEBUG)
     {
-        RunCallback(debugCb, domain, message);
+        RunCallback(debugCb, domain, message, 5);
     } else if (severity == LOG_SEVERITY_INFO) {
-        RunCallback(infoCb, domain, message);
+        RunCallback(infoCb, domain, message, 4);
     } else if (severity == LOG_SEVERITY_WARNING) {
-        RunCallback(warningCb, domain, message);
+        RunCallback(warningCb, domain, message, 7);
     } else if (severity >= LOG_SEVERITY_ERROR) {
-        RunCallback(errorCb, domain, message);
+        RunCallback(errorCb, domain, message, 5);
     }
 }
 
@@ -86,4 +86,4 @@ static dmExtension::Result ExtInit(dmExtension::Params *params)
     return dmExtension::RESULT_OK;
 }
 
-DM_DECLARE_EXTENSION(Commander, LIB_NAME, 0, 0, ExtInit, 0, 0, 0)
+DM_DECLARE_EXTENSION(CommanderExt, LIB_NAME, 0, 0, ExtInit, 0, 0, 0)
