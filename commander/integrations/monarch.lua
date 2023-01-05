@@ -36,6 +36,6 @@ local commands = {
   }
 }
 
-commander.register_commands(commands)
+commander.register_commands(commands, "Monarch")
 
 return M

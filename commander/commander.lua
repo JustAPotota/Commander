@@ -80,9 +80,15 @@ local BACKLOG = {}
 ---@field arguments Argument[]
 ---@field run function(args: any[])
 
----@type Command[]
-M.commands = {
-	{
+---@class CommandSet
+---@field domain string
+---@field commands Command[]
+
+---@type CommandSet[]
+M.commands = {}
+
+local builtin_commands = {
+  {
 		name = "help",
 		aliases = {},
 		description = "List available commands",
@@ -91,14 +97,17 @@ M.commands = {
 		},
 		run = function(args)
 			M.info("Available commands:")
-			for _, command in ipairs(M.commands) do
-				local name = command.name
-				if #command.aliases > 0 then
-					name = name .. ", " .. table.concat(command.aliases, ", ")
-				end
-
-				M.info("    " .. name .. " - " .. command.description)
-			end
+      for _, set in ipairs(M.commands) do
+        M.info(set.domain)
+        for _, command in ipairs(set.commands) do
+          local name = command.name
+          if #command.aliases > 0 then
+            name = name .. ", " .. table.concat(command.aliases, ", ")
+          end
+  
+          M.info("    " .. name .. " - " .. command.description)
+        end
+      end
 		end
 	},
 	{
@@ -315,12 +324,14 @@ end
 ---@param name string
 ---@return Command?
 function M.get_command(name)
-	for _, command in ipairs(M.commands) do
-		if name == command.name then return command end
-		for _, alias in ipairs(command.aliases) do
-			if name == alias then return command end
-		end
-	end
+  for _, set in ipairs(M.commands) do
+    for _, command in ipairs(set.commands) do
+      if name == command.name then return command end
+      for _, alias in ipairs(command.aliases) do
+        if name == alias then return command end
+      end
+    end
+  end
 end
 
 ---@param url url
@@ -406,17 +417,33 @@ function M.register_inspector(url)
 	M.info("Registered new inspector with " .. tostring(url), COMMANDER)
 end
 
----@param command Command
-function M.register_command(command)
-  table.insert(M.commands, command)
+---@param domain string
+---@return CommandSet?
+local function find_command_set(domain)
+  for _, set in ipairs(M.commands) do
+    if set.domain == domain then
+      return set
+    end
+  end
 end
 
 ---@param commands Command[]
-function M.register_commands(commands)
-  for _, command in ipairs(commands) do
-    table.insert(M.commands, command)
+---@param domain string
+function M.register_commands(commands, domain)
+  local set = find_command_set(domain)
+  if set then
+    for _, command in ipairs(commands) do
+      table.insert(set.commands, command)
+    end
+  else
+    local new_set = {
+      domain = domain,
+      commands = commands
+    }
+    table.insert(M.commands, new_set)
   end
 end
+M.register_commands(builtin_commands, "Commander")
 
 local function ext_debug(_, domain, message)
 	M.debug(message, domain)
