@@ -1,4 +1,4 @@
-local commander = require("commander.commander")
+local commander = require("commander.internal.commander")
 
 return {
   {

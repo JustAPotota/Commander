@@ -1,6 +1,6 @@
 components {
   id: "inspector"
-  component: "/commander/inspector.script"
+  component: "/commander/internal/inspector.script"
   position {
     x: 0.0
     y: 0.0

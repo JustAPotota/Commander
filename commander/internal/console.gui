@@ -1,4 +1,4 @@
-script: "/commander/console.gui_script"
+script: "/commander/internal/console.gui_script"
 fonts {
   name: "system_font"
   font: "/builtins/fonts/system_font.font"
