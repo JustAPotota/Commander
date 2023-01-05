@@ -56,6 +56,7 @@ end
 
 ---@class Message
 ---@field text string
+---@field domain string
 ---@field severity Severity
 
 ---@enum Severity
@@ -228,41 +229,35 @@ local function traceback(message)
   return debug.traceback(message, 2):gsub("\n\t", "\n  ")
 end
 
----@param text string
-function M.debug(text)
-	local message = {
-		text = text,
-		severity = M.SEVERITY.DEBUG
-	}
-	broadcast_or_hold(message)
+local function new_message(text, domain, severity)
+  local message = {
+    text = text or "",
+    domain = domain,
+    severity = severity
+  }
+  broadcast_or_hold(message)
 end
 
 ---@param text string
-function M.info(text)
-	local message = {
-		text = text,
-		severity = M.SEVERITY.INFO
-	}
-	broadcast_or_hold(message)
+function M.debug(text, domain)
+  new_message(text, domain, M.SEVERITY.DEBUG)
 end
 
 ---@param text string
-function M.warning(text)
-	local message = {
-		text = text,
-		severity = M.SEVERITY.WARNING
-	}
-	broadcast_or_hold(message)
+function M.info(text, domain)
+  new_message(text, domain, M.SEVERITY.INFO)
+end
+
+---@param text string
+function M.warning(text, domain)
+  new_message(text, domain, M.SEVERITY.WARNING)
 end
 
 ---@param text string
 ---@param disable_traceback boolean
-function M.error(text, disable_traceback)
-	local message = {
-		text = disable_traceback and text or traceback(text),
-		severity = M.SEVERITY.ERROR
-	}
-	broadcast_or_hold(message)
+function M.error(text, domain, disable_traceback)
+  local text = disable_traceback and text or traceback(text)
+  new_message(text, domain, M.SEVERITY.ERROR)
 end
 
 ---@param arguments Argument[]
@@ -429,7 +424,7 @@ local function ext_warning(_, domain, message)
 end
 
 local function ext_error(_, domain, message)
-	M.error(message, true)
+	M.error(message, nil, true)
 end
 
 function M.init()

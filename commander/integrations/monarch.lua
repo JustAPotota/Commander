@@ -22,6 +22,17 @@ local commands = {
     run = function(args)
       monarch.show(args[1])
     end
+  },
+  {
+    name = "hide",
+    aliases = {},
+    description = "Hide the Monarch screen of the given ID",
+    arguments = {
+      commander.TYPE_STRING
+    },
+    run = function(args)
+      monarch.hide(args[1])
+    end
   }
 }
 

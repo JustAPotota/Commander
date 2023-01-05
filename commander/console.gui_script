@@ -140,7 +140,11 @@ local COLORS = {
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("new_message") then
-		new_message(self, message.text, COLORS[message.severity])
+    local text = message.text
+    if message.domain then
+      text = message.domain .. ": " .. text
+    end
+		new_message(self, text, COLORS[message.severity])
 	end
 end
 
