@@ -6,24 +6,26 @@ M.MESSAGE_RUN_COMMAND = hash("run_command")
 
 ---@class Argument
 ---@field name string
+---@field desc string
 ---@field any_of boolean?
+---@field optional boolean?
 ---@field types Argument[]?
 
 M.TYPE_STRING = {
-	name = "a string"
+	name = "string",
+  desc = "a string"
 }
 M.TYPE_NUMBER = {
-	name = "a number"
+	name = "number",
+  desc = "a number"
 }
 M.TYPE_NIL = {
-	name = "nil"
+	name = "nil",
+  desc = "nil"
 }
 M.TYPE_URL = {
-	name = "a URL"
-}
-local TYPE_MAP = {
-	string = M.TYPE_STRING,
-	number = M.TYPE_NUMBER,
+	name = "URL",
+  desc = "a URL"
 }
 
 ---@param ... Argument
@@ -36,25 +38,65 @@ function M.TYPE_ANY_OF(...)
 		return types[1]
 	end
 
-	local name = ""
+	local desc = ""
 	if #types == 2 then
-		name = ("either %s or %s"):format(types[1].name, types[2].name)
+		desc = ("either %s or %s"):format(types[1].desc, types[2].desc)
 	else
 		for i, t in ipairs(types) do
 			if i == #types then
-				name = name .. "or " .. t.name
+				desc = desc .. "or " .. t.desc
 			else
-				name = name .. t.name .. ", "
+				desc = desc .. t.desc .. ", "
 			end
 		end
 	end
 
+  local name = ""
+  for i, t in ipairs(types) do
+    name = name .. t.name
+    if i < #types then
+      name = name .. "|"
+    end
+  end
+
 	return {
 		any_of = true,
 		types = types,
-		name = name
+    name = name,
+		desc = desc
 	}
 end
+
+---@param arg_type Argument
+---@return Argument
+function M.TYPE_OPTIONAL(arg_type)
+  return {
+    name = arg_type.name,
+    desc = arg_type.desc,
+    optional = true
+  }
+end
+
+---@param arguments Argument[]
+---@param arg_type Argument
+---@return boolean
+local function has_arg_type(arguments, arg_type)
+	for _, arg in ipairs(arguments) do
+		if arg == arg_type then
+			return true
+		elseif arg.types then
+			return has_arg_type(arg.types, arg_type)
+		end
+	end
+  return false
+end
+
+---@param arg_type Argument
+---@return boolean
+local function is_optional(arg_type)
+  return arg_type.any_of and has_arg_type(arg_type, M.TYPE_NIL) or arg_type == M.TYPE_NIL
+end
+
 
 ---@class Message
 ---@field text string
@@ -92,9 +134,7 @@ local builtin_commands = {
 		name = "help",
 		aliases = {},
 		description = "List available commands",
-		arguments = {
-			--M.TYPE_ANY_OF(M.TYPE_STRING, M.TYPE_NUMBER)
-		},
+		arguments = {},
 		run = function(args)
 			M.info("Available commands:")
       for _, set in ipairs(M.commands) do
@@ -104,8 +144,22 @@ local builtin_commands = {
           if #command.aliases > 0 then
             name = name .. ", " .. table.concat(command.aliases, ", ")
           end
+
+          local args = ""
+          for _, arg_type in ipairs(command.arguments) do
+            local arg = " "
+            if arg_type.optional then
+              arg = arg .. ("[%s]"):format(arg_type.name)
+            else
+              arg = arg .. ("<%s>"):format(arg_type.name)
+            end
+            args = args .. arg
+          end
+
+          local full_name = name .. args
+          full_name = full_name .. (" "):rep(25 - #full_name)
   
-          M.info("    " .. name .. " - " .. command.description)
+          M.info("    " .. full_name .. " - " .. command.description)
         end
       end
 		end
@@ -209,7 +263,7 @@ local function check_args(command, args)
 		local given = arg_type(args[i])
 		local ok, cast_arg = arg_matches(expected, args[i])
 		if not ok then
-			return false, ("Argument #%i must be %s, not %s"):format(i, expected.name, given.name)
+			return false, ("Argument #%i must be %s, not %s"):format(i, expected.desc, given.desc)
 		elseif cast_arg then
 			args[i] = cast_arg
 		end
@@ -273,20 +327,6 @@ end
 function M.error(text, domain, disable_traceback)
   local text = disable_traceback and text or traceback(text)
   new_message(text, domain, M.SEVERITY.ERROR)
-end
-
----@param arguments Argument[]
----@param arg_type Argument
----@return boolean
-local function has_arg_type(arguments, arg_type)
-	for _, arg in ipairs(arguments) do
-		if arg == arg_type then
-			return true
-		elseif arg.types then
-			return has_arg_type(arg.types, arg_type)
-		end
-	end
-  return false
 end
 
 ---@param command Command
