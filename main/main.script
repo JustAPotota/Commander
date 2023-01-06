@@ -1,6 +1,5 @@
-local commander = require("commander.commander")
 local monarch = require("monarch.monarch")
-local monarch_int = require("commander.integrations.monarch")
+local commander = require("commander.commander")
 
 function init(self)
 	msg.post(".", "acquire_input_focus")

@@ -423,7 +423,7 @@ local function ext_error(_, domain, message)
 	M.error(message, domain, true)
 end
 
-function M.init()
+function M.__init()
 	if sys.get_config_int("commander.capture_logs", 1) ~= 0 then
 		commander_ext.set_listeners(ext_debug, ext_info, ext_warning, ext_error)
 	end
