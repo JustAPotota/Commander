@@ -95,7 +95,7 @@ embedded_instances {
   "  }\n"
   "  properties {\n"
   "    id: \"screen_id\"\n"
-  "    value: \"monarch\"\n"
+  "    value: \"my_screen\"\n"
   "    type: PROPERTY_TYPE_HASH\n"
   "  }\n"
   "  property_decls {\n"

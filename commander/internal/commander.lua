@@ -73,7 +73,11 @@ function M.TYPE_OPTIONAL(arg_type)
   return {
     name = arg_type.name,
     desc = arg_type.desc,
-    optional = true
+    optional = true,
+    any_of = true,
+    types = {
+      arg_type, M.TYPE_NIL
+    }
   }
 end
 
