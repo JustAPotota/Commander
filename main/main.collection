@@ -78,7 +78,7 @@ embedded_instances {
   }
 }
 embedded_instances {
-  id: "monarch"
+  id: "my_screen"
   data: "components {\n"
   "  id: \"screen_proxy\"\n"
   "  component: \"/monarch/screen_proxy.script\"\n"

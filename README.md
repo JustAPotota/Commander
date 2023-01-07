@@ -1,9 +1,10 @@
 # Commander
-A drop-in debug console and command system for the [Defold game engine](https://www.defold.com/) with support for popular libraries.
+A debug console and command system for the [Defold game engine](https://www.defold.com/) with support for popular libraries.
 
 # Contents
-1. [Installation](#installation)
-2. [Usage](#usage)
+1. [**Installation**](#installation)
+2. [**Usage**](#usage)
+3. [**Built-in Commands**](#built-in-commands)
 
 # Installation
 You can use Commander in your own project by adding it as a [Defold library dependency](https://defold.com/manuals/libraries/). Open your `game.project` file and under `Project > Dependencies` add:
