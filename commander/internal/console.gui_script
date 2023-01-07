@@ -117,6 +117,7 @@ function init(self)
 
 	update_prompt(self)
 	gui.set_enabled(self.console_node, self.shown)
+  new_message(self, "Type 'help' to view all available commands", vmath.vector4(0.12, 0.90, 0.50, 1))
 end
 
 function final(self)

@@ -371,7 +371,6 @@ end
 function M.register_console(url)
 	table.insert(CONSOLES, url)
 	M.info("Registered new console with " .. tostring(url), COMMANDER)
-	M.info("Type 'help' to view all available commands", COMMANDER)
 
   for i = 1, #BACKLOG do
     broadcast(BACKLOG[i])
