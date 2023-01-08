@@ -9,7 +9,7 @@ A debug console and command system for the [Defold game engine](https://www.defo
 # Installation
 You can use Commander in your own project by adding it as a [Defold library dependency](https://defold.com/manuals/libraries/). Open your `game.project` file and under `Project > Dependencies` add:
 
-> https://github.com/JustAPotota/Commander/archive/master.zip
+> https://github.com/JustAPotota/Commander/archive/refs/heads/main.zip
 
 Or point to the ZIP file of a specific release such as:
 > https://github.com/JustAPotota/Commander/archive/refs/tags/v1.0.0.zip
