@@ -12,7 +12,7 @@ You can use Commander in your own project by adding it as a [Defold library depe
 > https://github.com/JustAPotota/Commander/archive/master.zip
 
 Or point to the ZIP file of a specific release such as:
-> https://github.com/JustAPotota/Commander/archive/v1.0.zip.
+> https://github.com/JustAPotota/Commander/archive/refs/tags/v1.0.0.zip
 
 # Usage
 ### TL;DR:
