@@ -87,3 +87,61 @@ Hide all Monarch screens.
 - offset (`number?`) - Optional offset from the top of the stack
 
 Print the ID of the screen at the top of the stack.
+
+# API Reference
+
+### **`commander.init()`**
+Takes care of any initialization that needs to be done, like setting up integrations and the log listener extension (if `commander.capture_logs` is set). 
+
+### **`commander.run_command(command, args)`**
+**Arguments**:
+- command (`Command` | `string`) - Either a Command table or the name of a command
+- args (`any[]`) - Arguments to be passed to the command
+
+Runs the given command with the given arguments. If `command` is a string, it will use [`commander.get_command()`](#commanderget_commandname) to search it by name. All strings in the given arguments will be cast to the correct type, if possible.
+
+**Examples**
+```lua
+commander.run("help")
+
+commander.run("get_pos", { "my_go" })
+```
+
+### **`commander.get_command(name)`**
+**Arguments**:
+- name (`string`) - Name of the command
+
+**Returns**:
+- command (`Command?`) - Command with the given name or `nil` if it can't be found
+
+Searches for the command with the given name in `commander.commands` and returns it if it was found, or `nil` if it wasn't.
+
+### **`commander.register_commands(commands, domain)`**
+**Arguments**:
+- commands (`Command[]`) - Array of commands to register
+- domain (`string`) - Human-readable name for this group of commands, e.g. `"Commander"` or `"Monarch"`
+
+Adds a new command set to `commander.commands` with the given commands and domain.
+
+### **`commander.register_console(url)`**
+**Arguments**:
+- url (`url`) - Address of the console script
+
+Registers the given script as a console. See the section on consoles for more information.
+
+### **`commander.register_inspector(url)`**
+**Arguments**:
+- url (`url`) - Address of the inspector script
+
+Registers the given script as an inspector. Only intended to be used by `/commander/inspector.go`.
+
+### **`commander.debug(text, domain)`**
+### **`commander.info(text, domain)`**
+### **`commander.warning(text, domain)`**
+### **`commander.error(text, domain, disable_traceback)`**
+**Arguments**:
+- text (`string`) - Message to log
+- domain (`string?`) - Optional name to prepend to the message, e.g. `"SCRIPT"` or `"COMMANDER"`
+- disable_traceback (`bool?`) - Set to `true` to disable automatically adding a stack traceback
+
+Sends the given message to all registered consoles for them to process or display. The name of the function represents the log level. For error messages, a stack traceback will automatically be appended using [`debug.traceback()`](http://www.lua.org/manual/5.2/manual.html#pdf-debug.traceback) unless `disable_traceback` is set to `true`.
