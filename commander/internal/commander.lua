@@ -13,19 +13,19 @@ M.MESSAGE_RUN_COMMAND = hash("run_command")
 
 M.TYPE_STRING = {
 	name = "string",
-  desc = "a string"
+	desc = "a string"
 }
 M.TYPE_NUMBER = {
 	name = "number",
-  desc = "a number"
+	desc = "a number"
 }
 M.TYPE_NIL = {
 	name = "nil",
-  desc = "nil"
+	desc = "nil"
 }
 M.TYPE_URL = {
 	name = "url",
-  desc = "a url"
+	desc = "a url"
 }
 
 ---@param ... Argument
@@ -51,18 +51,18 @@ function M.TYPE_ANY_OF(...)
 		end
 	end
 
-  local name = ""
-  for i, t in ipairs(types) do
-    name = name .. t.name
-    if i < #types then
-      name = name .. "|"
-    end
-  end
+	local name = ""
+	for i, t in ipairs(types) do
+		name = name .. t.name
+		if i < #types then
+			name = name .. "|"
+		end
+	end
 
 	return {
 		any_of = true,
 		types = types,
-    name = name,
+		name = name,
 		desc = desc
 	}
 end
@@ -70,15 +70,15 @@ end
 ---@param arg_type Argument
 ---@return Argument
 function M.TYPE_OPTIONAL(arg_type)
-  return {
-    name = arg_type.name,
-    desc = arg_type.desc,
-    optional = true,
-    any_of = true,
-    types = {
-      arg_type, M.TYPE_NIL
-    }
-  }
+	return {
+		name = arg_type.name,
+		desc = arg_type.desc,
+		optional = true,
+		any_of = true,
+		types = {
+			arg_type, M.TYPE_NIL
+		}
+	}
 end
 
 ---@param arguments Argument[]
@@ -92,7 +92,7 @@ local function has_arg_type(arguments, arg_type)
 			return has_arg_type(arg.types, arg_type)
 		end
 	end
-  return false
+	return false
 end
 
 ---@class Message
@@ -129,8 +129,8 @@ M.commands = {}
 ---@param value any
 ---@return boolean
 local function is_url(value)
-  assert(value.socket ~= nil)
-  return true
+	assert(value.socket ~= nil)
+	return true
 end
 
 ---@param arg any
@@ -138,15 +138,15 @@ end
 local function arg_type(arg)
 	local type_name = type(arg)
 
-  if type_name == "string" then
-    return M.TYPE_STRING
-  elseif type_name == "number" then
-    return M.TYPE_NUMBER
-  elseif type_name == "userdata" then
-    if pcall(is_url, arg) then
-      return M.TYPE_URL
-    end
-  end
+	if type_name == "string" then
+		return M.TYPE_STRING
+	elseif type_name == "number" then
+		return M.TYPE_NUMBER
+	elseif type_name == "userdata" then
+		if pcall(is_url, arg) then
+			return M.TYPE_URL
+		end
+	end
 
 	return M.TYPE_NIL
 end
@@ -218,42 +218,42 @@ end
 ---@param message string
 ---@return string, number
 local function traceback(message)
-  return debug.traceback(message, 2):gsub("\n\t", "\n  ")
+	return debug.traceback(message, 2):gsub("\n\t", "\n  ")
 end
 
 local function new_message(text, domain, severity)
-  local message = {
-    text = text or "",
-    domain = domain,
-    severity = severity
-  }
-  broadcast_or_hold(message)
+	local message = {
+		text = text or "",
+		domain = domain,
+		severity = severity
+	}
+	broadcast_or_hold(message)
 end
 
 ---@param text string
 ---@param domain string?
 function M.debug(text, domain)
-  new_message(text, domain, M.SEVERITY.DEBUG)
+	new_message(text, domain, M.SEVERITY.DEBUG)
 end
 
 ---@param text string
 ---@param domain string?
 function M.info(text, domain)
-  new_message(text, domain, M.SEVERITY.INFO)
+	new_message(text, domain, M.SEVERITY.INFO)
 end
 
 ---@param text string
 ---@param domain string?
 function M.warning(text, domain)
-  new_message(text, domain, M.SEVERITY.WARNING)
+	new_message(text, domain, M.SEVERITY.WARNING)
 end
 
 ---@param text string
 ---@param domain string?
 ---@param disable_traceback boolean?
 function M.error(text, domain, disable_traceback)
-  local text = disable_traceback and text or traceback(text)
-  new_message(text, domain, M.SEVERITY.ERROR)
+	local text = disable_traceback and text or traceback(text)
+	new_message(text, domain, M.SEVERITY.ERROR)
 end
 
 ---@param command Command
@@ -265,40 +265,40 @@ end
 ---@param args any[]
 ---@return url[]
 local function get_urls(args)
-  local urls = {}
-  for _, v in ipairs(args) do
-    if type(v) == "userdata" and v.socket then
-      table.insert(urls, v)
-    end
-  end
-  return urls
+	local urls = {}
+	for _, v in ipairs(args) do
+		if type(v) == "userdata" and v.socket then
+			table.insert(urls, v)
+		end
+	end
+	return urls
 end
 
 ---@param urls url[]
 ---@return boolean
 local function has_multiple_sockets(urls)
-  local current_socket
-  for _, url in ipairs(urls) do
-    if current_socket and url.socket ~= current_socket then
-      return true
-    end
-    current_socket = url.socket
-  end
+	local current_socket
+	for _, url in ipairs(urls) do
+		if current_socket and url.socket ~= current_socket then
+			return true
+		end
+		current_socket = url.socket
+	end
 
-  return false
+	return false
 end
 
 ---@param name string
 ---@return Command?
 function M.get_command(name)
-  for _, set in ipairs(M.commands) do
-    for _, command in ipairs(set.commands) do
-      if name == command.name then return command end
-      for _, alias in ipairs(command.aliases) do
-        if name == alias then return command end
-      end
-    end
-  end
+	for _, set in ipairs(M.commands) do
+		for _, command in ipairs(set.commands) do
+			if name == command.name then return command end
+			for _, alias in ipairs(command.aliases) do
+				if name == alias then return command end
+			end
+		end
+	end
 end
 
 ---@param url url
@@ -312,20 +312,20 @@ local function find_valid_inspector(url)
 end
 
 local function is_go()
-  return pcall(go.get_id)
+	return pcall(go.get_id)
 end
 
 local function run_command(command, args)
-  local ok, message = pcall(command.run, args)
-  if not ok then
-    M.error(message, COMMANDER)
-  end
+	local ok, message = pcall(command.run, args)
+	if not ok then
+		M.error(message, COMMANDER)
+	end
 end
 
 ---@param command Command|string
 ---@param args any[]
 function M.run_command(command, args)
-  local command_name = command
+	local command_name = command
 	if type(command) == "string" then
 		local maybe_command = M.get_command(command)
 		if maybe_command then
@@ -338,44 +338,43 @@ function M.run_command(command, args)
 	if type(command) ~= "table" then
 		return M.error("Command must be a table or a string, not " .. arg_type(command).name, COMMANDER)
 	end
-  
+	
 	local ok, err = check_args(command, args)
-
-	if ok then
-    if requires_inspector(command) then
-      local urls = get_urls(args)
-      if #urls == 0 then return run_command(command, args) end
-      if has_multiple_sockets(urls) then
-        return M.error("Cannot run a command on multiple sockets", COMMANDER)
-      end
-
-      local url = urls[1]
-      if url.socket == msg.url().socket and is_go() then
-        return run_command(command, args)
-      end
-
-      local inspector = find_valid_inspector(url)
-      if not inspector then
-        return M.error("No inspector found in socket with " .. tostring(url.socket), COMMANDER)
-      end
-
-      msg.post(inspector, "run_command", { command = command_name, args = args })
-    else
-      run_command(command, args)
-    end
-	else
-		M.error(err, COMMANDER)
+	if not ok then
+		return M.error(err, COMMANDER)
 	end
+
+	if not requires_inspector(command) then
+		return run_command(command, args)
+	end
+	
+	local urls = get_urls(args)
+	if #urls == 0 then return run_command(command, args) end
+	if has_multiple_sockets(urls) then
+		return M.error("Cannot run a command on multiple sockets", COMMANDER)
+	end
+
+	local url = urls[1]
+	if url.socket == msg.url().socket and is_go() then
+		return run_command(command, args)
+	end
+
+	local inspector = find_valid_inspector(url)
+	if not inspector then
+		return M.error("No inspector found in socket with " .. tostring(url.socket), COMMANDER)
+	end
+
+	msg.post(inspector, "run_command", { command = command_name, args = args })
 end
 
 function M.register_console(url)
 	table.insert(CONSOLES, url)
 	M.info("Registered new console with " .. tostring(url), COMMANDER)
 
-  for i = 1, #BACKLOG do
-    broadcast(BACKLOG[i])
-    BACKLOG[i] = nil
-  end
+	for i = 1, #BACKLOG do
+		broadcast(BACKLOG[i])
+		BACKLOG[i] = nil
+	end
 end
 
 function M.register_inspector(url)
@@ -386,28 +385,28 @@ end
 ---@param domain string
 ---@return CommandSet?
 local function find_command_set(domain)
-  for _, set in ipairs(M.commands) do
-    if set.domain == domain then
-      return set
-    end
-  end
+	for _, set in ipairs(M.commands) do
+		if set.domain == domain then
+			return set
+		end
+	end
 end
 
 ---@param commands Command[]
 ---@param domain string
 function M.register_commands(commands, domain)
-  local set = find_command_set(domain)
-  if set then
-    for _, command in ipairs(commands) do
-      table.insert(set.commands, command)
-    end
-  else
-    local new_set = {
-      domain = domain,
-      commands = commands
-    }
-    table.insert(M.commands, new_set)
-  end
+	local set = find_command_set(domain)
+	if set then
+		for _, command in ipairs(commands) do
+			table.insert(set.commands, command)
+		end
+	else
+		local new_set = {
+			domain = domain,
+			commands = commands
+		}
+		table.insert(M.commands, new_set)
+	end
 end
 
 local function ext_debug(_, domain, message)

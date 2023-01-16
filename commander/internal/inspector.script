@@ -6,6 +6,6 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == commander.MESSAGE_RUN_COMMAND then
-    commander.run_command(message.command, message.args)
-  end
+		commander.run_command(message.command, message.args)
+	end
 end

@@ -1,38 +1,38 @@
 local commander = require("commander.internal.commander")
 
 return {
-  {
+	{
 		name = "help",
 		aliases = {},
 		description = "List available commands",
 		arguments = {},
 		run = function(args)
 			commander.info("Available commands:")
-      for _, set in ipairs(commander.commands) do
-        commander.info(set.domain)
-        for _, command in ipairs(set.commands) do
-          local name = command.name
-          if #command.aliases > 0 then
-            name = name .. ", " .. table.concat(command.aliases, ", ")
-          end
+			for _, set in ipairs(commander.commands) do
+				commander.info(set.domain)
+				for _, command in ipairs(set.commands) do
+				local name = command.name
+				if #command.aliases > 0 then
+					name = name .. ", " .. table.concat(command.aliases, ", ")
+				end
 
-          local args = ""
-          for _, arg_type in ipairs(command.arguments) do
-            local arg = " "
-            if arg_type.optional then
-              arg = arg .. ("[%s]"):format(arg_type.name)
-            else
-              arg = arg .. ("<%s>"):format(arg_type.name)
-            end
-            args = args .. arg
-          end
+				local args = ""
+				for _, arg_type in ipairs(command.arguments) do
+					local arg = " "
+					if arg_type.optional then
+					arg = arg .. ("[%s]"):format(arg_type.name)
+					else
+					arg = arg .. ("<%s>"):format(arg_type.name)
+					end
+					args = args .. arg
+				end
 
-          local full_name = name .. args
-          full_name = full_name .. (" "):rep(25 - #full_name)
-  
-          commander.info("    " .. full_name .. " - " .. command.description)
-        end
-      end
+				local full_name = name .. args
+				full_name = full_name .. (" "):rep(25 - #full_name)
+
+				commander.info("    " .. full_name .. " - " .. command.description)
+				end
+			end
 		end
 	},
 	{
@@ -65,7 +65,7 @@ return {
 			commander.TYPE_URL
 		},
 		run = function(args)
-      commander.info(tostring(go.get_position(args[1])))
+			commander.info(tostring(go.get_position(args[1])))
 		end
 	}
 }
