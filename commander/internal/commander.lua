@@ -322,10 +322,31 @@ local function run_command(command, args)
 	end
 end
 
+---@param command Command
+---@param args any[]
+local function run_with_inspector(command, args)
+	local urls = get_urls(args)
+	if #urls == 0 then return run_command(command, args) end
+	if has_multiple_sockets(urls) then
+		return M.error("Cannot run a command on multiple sockets", COMMANDER)
+	end
+
+	local url = urls[1]
+	if url.socket == msg.url().socket and is_go() then
+		return run_command(command, args)
+	end
+
+	local inspector = find_valid_inspector(url)
+	if not inspector then
+		return M.error("No inspector found in socket with " .. tostring(url.socket), COMMANDER)
+	end
+
+	msg.post(inspector, "run_command", { command = command.name, args = args })
+end
+
 ---@param command Command|string
 ---@param args any[]
 function M.run_command(command, args)
-	local command_name = command
 	if type(command) == "string" then
 		local maybe_command = M.get_command(command)
 		if maybe_command then
@@ -348,23 +369,7 @@ function M.run_command(command, args)
 		return run_command(command, args)
 	end
 	
-	local urls = get_urls(args)
-	if #urls == 0 then return run_command(command, args) end
-	if has_multiple_sockets(urls) then
-		return M.error("Cannot run a command on multiple sockets", COMMANDER)
-	end
-
-	local url = urls[1]
-	if url.socket == msg.url().socket and is_go() then
-		return run_command(command, args)
-	end
-
-	local inspector = find_valid_inspector(url)
-	if not inspector then
-		return M.error("No inspector found in socket with " .. tostring(url.socket), COMMANDER)
-	end
-
-	msg.post(inspector, "run_command", { command = command_name, args = args })
+	run_with_inspector(command, args)
 end
 
 function M.register_console(url)
