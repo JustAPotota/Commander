@@ -24,8 +24,8 @@ M.TYPE_NIL = {
   desc = "nil"
 }
 M.TYPE_URL = {
-	name = "URL",
-  desc = "a URL"
+	name = "url",
+  desc = "a url"
 }
 
 ---@param ... Argument
