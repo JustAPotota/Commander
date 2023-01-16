@@ -187,7 +187,7 @@ nodes {
   text_leading: 1.0
   text_tracking: 0.0
   custom_type: 0
-  enabled: true
+  enabled: false
   visible: true
 }
 nodes {
@@ -274,9 +274,9 @@ nodes {
     w: 1.0
   }
   color {
-    x: 1.0
-    y: 1.0
-    z: 1.0
+    x: 0.0
+    y: 0.0
+    z: 0.0
     w: 1.0
   }
   type: TYPE_BOX
@@ -299,7 +299,7 @@ nodes {
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
-  alpha: 0.0
+  alpha: 1.0
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
   custom_type: 0
