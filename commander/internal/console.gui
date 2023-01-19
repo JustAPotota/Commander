@@ -47,7 +47,7 @@ nodes {
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
-  adjust_mode: ADJUST_MODE_FIT
+  adjust_mode: ADJUST_MODE_STRETCH
   layer: ""
   inherit_alpha: true
   slice9 {
@@ -104,7 +104,7 @@ nodes {
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_SW
-  adjust_mode: ADJUST_MODE_FIT
+  adjust_mode: ADJUST_MODE_STRETCH
   parent: "console"
   layer: ""
   inherit_alpha: false
@@ -175,7 +175,7 @@ nodes {
     z: 1.0
     w: 1.0
   }
-  adjust_mode: ADJUST_MODE_STRETCH
+  adjust_mode: ADJUST_MODE_FIT
   line_break: true
   parent: "output"
   layer: ""
@@ -228,7 +228,7 @@ nodes {
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_W
-  adjust_mode: ADJUST_MODE_FIT
+  adjust_mode: ADJUST_MODE_STRETCH
   parent: "console"
   layer: ""
   inherit_alpha: false
