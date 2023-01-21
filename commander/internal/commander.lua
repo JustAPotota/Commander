@@ -173,7 +173,7 @@ local function arg_matches(expected, arg)
 	end
 
 	if expected == M.TYPE_NUMBER and given == M.TYPE_STRING then
-		local str = tostring(arg)
+		local str = tonumber(arg)
 		if str then
 			return true, str
 		end
