@@ -35,6 +35,18 @@ local commands = {
 		run = function(args)
 			commander.info(tostring(ortho.get_zoom(args[1])), ORTHOGRAPHIC)
 		end
+	},
+	{
+		name = "ortho.set_zoom",
+		aliases = {},
+		description = "Set the zoom level of the given camera",
+		arguments = {
+			commander.TYPE_OPTIONAL(commander.TYPE_HASH),
+			commander.TYPE_NUMBER
+		},
+		run = function(args)
+			ortho.set_zoom(args[1], args[2])
+		end
 	}
 }
 
