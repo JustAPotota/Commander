@@ -165,8 +165,9 @@ local function arg_matches(expected, arg)
 
 	if expected.any_of then
 		for _, t in ipairs(expected.types) do
-			if arg_matches(t, arg) then
-				return true
+			local ok, cast_arg = arg_matches(t, arg)
+			if ok then
+				return true, cast_arg
 			end
 		end
 	end
