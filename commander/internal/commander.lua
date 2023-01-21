@@ -27,6 +27,10 @@ M.TYPE_URL = {
 	name = "url",
 	desc = "a url"
 }
+M.TYPE_HASH = {
+	name = "hash",
+	desc = "a hash"
+}
 
 ---@param ... Argument
 function M.TYPE_ANY_OF(...)
@@ -177,6 +181,8 @@ local function arg_matches(expected, arg)
 		if ok then
 			return true, url
 		end
+	elseif expected == M.TYPE_HASH and given == M.TYPE_STRING then
+		return true, hash(arg)
 	end
 
 	return false

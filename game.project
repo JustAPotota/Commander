@@ -1,5 +1,6 @@
 [bootstrap]
 main_collection = /main/main.collectionc
+render = /orthographic/render/orthographic.renderc
 
 [script]
 shared_state = 1
@@ -14,6 +15,7 @@ input_method = HiddenInputField
 [project]
 title = Commander
 dependencies#0 = https://github.com/britzl/monarch/archive/refs/tags/3.7.0.zip
+dependencies#1 = https://github.com/britzl/defold-orthographic/archive/refs/tags/3.2.1.zip
 
 [input]
 game_binding = /builtins/input/all.input_bindingc
