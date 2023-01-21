@@ -19,6 +19,13 @@ Or point to the ZIP file of a specific release such as:
 - Import `commander.commander` into a script and run `commander.init()`
 - Add `/commander/console.go` to your boostrap collection
 - Add `/commander/inspector.go` to your other collections
+- Use `/builtins/input/all.input_binding` or add the following bindings:
+  - Backspace -> `key_backspace`
+  - Enter -> `key_enter`
+  - Grave -> `key_grave`
+  - Up/Down/Left/Right -> `key_up`/`key_down`/`key_left`/`key_right`
+  - Button 1/Button Left -> `touch`
+  - Text -> `text`
 
 ---
 
