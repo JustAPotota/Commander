@@ -1,7 +1,7 @@
 script: "/commander/internal/console.gui_script"
 fonts {
   name: "system_font"
-  font: "/builtins/fonts/system_font.font"
+  font: "/commander/internal/system_font.font"
 }
 background_color {
   x: 0.0
