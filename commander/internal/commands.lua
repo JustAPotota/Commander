@@ -4,7 +4,7 @@ return {
 	{
 		name = "help",
 		aliases = {},
-		description = "List available commands",
+		summary = "List available commands",
 		parameters = {},
 		run = function(args)
 			commander.info("Available commands:")
@@ -24,7 +24,7 @@ return {
 					local full_name = name .. params
 					full_name = full_name .. (" "):rep(25 - #full_name)
 
-					commander.info(("    %s - %s"):format(full_name, command.description))
+					commander.info(("    %s - %s"):format(full_name, command.summary))
 				end
 			end
 		end
@@ -32,7 +32,7 @@ return {
 	{
 		name = "exit",
 		aliases = { "quit" },
-		description = "Exit the game",
+		summary = "Exit the game",
 		parameters = {},
 		run = function(args)
 			sys.exit(1)
@@ -41,7 +41,8 @@ return {
 	{
 		name = "lua",
 		aliases = { "run" },
-		description = "Run the given Lua code",
+		summary = "Run the given Lua code",
+		description = "Executes the given string as a Lua function using loadstring(). If multiple arguments are passed, they'll be concatenated by spaces.",
 		parameters = {
 			{
 				name = "code",
@@ -58,7 +59,7 @@ return {
 	{
 		name = "get_pos",
 		aliases = {},
-		description = "Print the position of the given game object",
+		summary = "Print the position of the given game object",
 		parameters = {
 			{
 				name = "url",

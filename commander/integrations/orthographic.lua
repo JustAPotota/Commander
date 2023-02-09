@@ -15,7 +15,7 @@ local commands = {
 	{
 		name = "ortho.get_cameras",
 		aliases = {},
-		description = "Print a list of all camera IDs",
+		summary = "Print a list of all camera IDs",
 		parameters = {},
 		run = function()
 			commander.info("{", ORTHOGRAPHIC)
@@ -28,7 +28,7 @@ local commands = {
 	{
 		name = "ortho.get_zoom",
 		aliases = {},
-		description = "Print the zoom level of the given camera",
+		summary = "Print the zoom level of the given camera",
 		parameters = {
 			{
 				name = "id",
@@ -44,7 +44,7 @@ local commands = {
 	{
 		name = "ortho.set_zoom",
 		aliases = {},
-		description = "Set the zoom level of the given camera",
+		summary = "Set the zoom level of the given camera",
 		parameters = {
 			{
 				name = "zoom",

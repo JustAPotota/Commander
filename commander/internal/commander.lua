@@ -4,6 +4,14 @@ local COMMANDER = "COMMANDER"
 
 M.MESSAGE_RUN_COMMAND = hash("run_command")
 
+---@class Command
+---@field name string Name of the command
+---@field aliases string[]
+---@field summary string Short description of what the command does
+---@field description string? Full description of what the command does. If not given, the summary will be used instead
+---@field parameters Parameter[]
+---@field run function(args: any[])
+
 ---@class Parameter
 ---@field name string
 ---@field description string
@@ -14,26 +22,50 @@ M.MESSAGE_RUN_COMMAND = hash("run_command")
 ---@field name string
 ---@field description string
 
+---@class CommandSet
+---@field domain string
+---@field commands Command[]
+
+---@type Type
 M.TYPE_STRING = {
 	name = "string",
 	description = "a string"
 }
+---@type Type
 M.TYPE_NUMBER = {
 	name = "number",
 	description = "a number"
 }
+---@type Type
 M.TYPE_NIL = {
 	name = "nil",
 	description = "nil"
 }
+---@type Type
 M.TYPE_URL = {
 	name = "url",
 	description = "a url"
 }
+---@type Type
 M.TYPE_HASH = {
 	name = "hash",
 	description = "a hash"
 }
+
+
+---@class Message
+---@field text string
+---@field domain string?
+---@field severity Severity
+
+---@enum Severity
+M.SEVERITY = {
+	DEBUG = 0,
+	INFO = 1,
+	WARNING = 2,
+	ERROR = 3
+}
+
 
 ---@param type Type
 ---@return Type ...
@@ -53,33 +85,9 @@ local function contains_type(parameters, type)
 	return false
 end
 
----@class Message
----@field text string
----@field domain string?
----@field severity Severity
-
----@enum Severity
-M.SEVERITY = {
-	DEBUG = 0,
-	INFO = 1,
-	WARNING = 2,
-	ERROR = 3
-}
-
 local CONSOLES = {}
 local INSPECTORS = {}
 local BACKLOG = {}
-
----@class Command
----@field name string
----@field aliases string[]
----@field description string
----@field parameters Parameter[]
----@field run function(args: any[])
-
----@class CommandSet
----@field domain string
----@field commands Command[]
 
 ---@type CommandSet[]
 M.commands = {}

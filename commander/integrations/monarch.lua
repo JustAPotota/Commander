@@ -13,7 +13,7 @@ local commands = {
 	{
 		name = "monarch.show",
 		aliases = {},
-		description = "Show the Monarch screen of the given ID",
+		summary = "Show the Monarch screen of the given ID",
 		parameters = {
 			{
 				name = "id",
@@ -28,7 +28,7 @@ local commands = {
 	{
 		name = "monarch.hide",
 		aliases = {},
-		description = "Hide the Monarch screen of the given ID",
+		summary = "Hide the Monarch screen of the given ID",
 		parameters = {
 			{
 				name = "id",
@@ -43,7 +43,7 @@ local commands = {
 	{
 		name = "monarch.clear",
 		aliases = {},
-		description = "Hide all Monarch screens",
+		summary = "Hide all Monarch screens",
 		parameters = {},
 		run = function()
 			monarch.clear()
@@ -52,7 +52,7 @@ local commands = {
 	{
 		name = "monarch.top",
 		aliases = {},
-		description = "Print the ID of the screen at the top of the stack",
+		summary = "Print the ID of the screen at the top of the stack",
 		parameters = {
 			{
 				name = "offset",
