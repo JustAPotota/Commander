@@ -6,7 +6,7 @@ M.MESSAGE_RUN_COMMAND = hash("run_command")
 
 ---@class Command
 ---@field name string Name of the command
----@field aliases string[]
+---@field aliases string[] Alternate names
 ---@field summary string Short description of what the command does
 ---@field description string? Full description of what the command does. If not given, the summary will be used instead
 ---@field parameters Parameter[]
