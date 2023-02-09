@@ -16,7 +16,7 @@ local commands = {
 		name = "ortho.get_cameras",
 		aliases = {},
 		description = "Print a list of all camera IDs",
-		arguments = {},
+		parameters = {},
 		run = function()
 			commander.info("{", ORTHOGRAPHIC)
 			for _, id in ipairs(ortho.get_cameras()) do
@@ -29,8 +29,13 @@ local commands = {
 		name = "ortho.get_zoom",
 		aliases = {},
 		description = "Print the zoom level of the given camera",
-		arguments = {
-			commander.TYPE_OPTIONAL(commander.TYPE_HASH)
+		parameters = {
+			{
+				name = "id",
+				description = "ID of the camera to use. Not required if there's only one",
+				type = commander.TYPE_HASH,
+				optional = true
+			}
 		},
 		run = function(args)
 			commander.info(tostring(ortho.get_zoom(args[1])), ORTHOGRAPHIC)
@@ -40,12 +45,21 @@ local commands = {
 		name = "ortho.set_zoom",
 		aliases = {},
 		description = "Set the zoom level of the given camera",
-		arguments = {
-			commander.TYPE_OPTIONAL(commander.TYPE_HASH),
-			commander.TYPE_NUMBER
+		parameters = {
+			{
+				name = "zoom",
+				description = "Zoom level to set",
+				type = commander.TYPE_NUMBER
+			},
+			{
+				name = "id",
+				description = "ID of the camera to use. Not required if there's only one",
+				type = commander.TYPE_HASH,
+				optional = true
+			}
 		},
 		run = function(args)
-			ortho.set_zoom(args[1], args[2])
+			ortho.set_zoom(args[2], args[1])
 		end
 	}
 }

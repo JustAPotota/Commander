@@ -4,96 +4,50 @@ local COMMANDER = "COMMANDER"
 
 M.MESSAGE_RUN_COMMAND = hash("run_command")
 
----@class Argument
+---@class Parameter
 ---@field name string
----@field desc string
----@field any_of boolean?
----@field optional boolean?
----@field types Argument[]?
+---@field description string
+---@field type Type
+---@field optional bool?
+
+---@class Type
+---@field name string
+---@field description string
 
 M.TYPE_STRING = {
 	name = "string",
-	desc = "a string"
+	description = "a string"
 }
 M.TYPE_NUMBER = {
 	name = "number",
-	desc = "a number"
+	description = "a number"
 }
 M.TYPE_NIL = {
 	name = "nil",
-	desc = "nil"
+	description = "nil"
 }
 M.TYPE_URL = {
 	name = "url",
-	desc = "a url"
+	description = "a url"
 }
 M.TYPE_HASH = {
 	name = "hash",
-	desc = "a hash"
+	description = "a hash"
 }
 
----@param ... Argument
-function M.TYPE_ANY_OF(...)
-	local types = { ... }
-
-	if #types == 0 then
-		return M.TYPE_NIL
-	elseif #types == 1 then
-		return types[1]
-	end
-
-	local desc = ""
-	if #types == 2 then
-		desc = ("either %s or %s"):format(types[1].desc, types[2].desc)
-	else
-		for i, t in ipairs(types) do
-			if i == #types then
-				desc = desc .. "or " .. t.desc
-			else
-				desc = desc .. t.desc .. ", "
-			end
-		end
-	end
-
-	local name = ""
-	for i, t in ipairs(types) do
-		name = name .. t.name
-		if i < #types then
-			name = name .. "|"
-		end
-	end
-
-	return {
-		any_of = true,
-		types = types,
-		name = name,
-		desc = desc
-	}
+---@param type Type
+---@return Type ...
+function M.OPTIONAL(type)
+	return type, M.TYPE_NIL
 end
 
----@param arg_type Argument
----@return Argument
-function M.TYPE_OPTIONAL(arg_type)
-	return {
-		name = arg_type.name,
-		desc = arg_type.desc,
-		optional = true,
-		any_of = true,
-		types = {
-			arg_type, M.TYPE_NIL
-		}
-	}
-end
-
----@param arguments Argument[]
----@param arg_type Argument
+---@param parameters Parameter[]
+---@param type Type
 ---@return boolean
-local function has_arg_type(arguments, arg_type)
-	for _, arg in ipairs(arguments) do
-		if arg == arg_type then
+local function contains_type(parameters, type)
+	for _, param in ipairs(parameters) do
+		if param.type == type then
 			return true
-		elseif arg.types then
-			return has_arg_type(arg.types, arg_type)
 		end
 	end
 	return false
@@ -120,7 +74,7 @@ local BACKLOG = {}
 ---@field name string
 ---@field aliases string[]
 ---@field description string
----@field arguments Argument[]
+---@field parameters Parameter[]
 ---@field run function(args: any[])
 
 ---@class CommandSet
@@ -138,8 +92,8 @@ local function is_url(value)
 end
 
 ---@param arg any
----@return Argument
-local function arg_type(arg)
+---@return Type
+local function get_type(arg)
 	local type_name = type(arg)
 
 	if type_name == "string" then
@@ -155,49 +109,62 @@ local function arg_type(arg)
 	return M.TYPE_NIL
 end
 
----@param expected Argument
----@param arg any
----@return boolean,any?
-local function arg_matches(expected, arg)
-	local given = arg_type(arg)
-
-	if given == expected then return true end
-
-	if expected.any_of then
-		for _, t in ipairs(expected.types) do
-			local ok, cast_arg = arg_matches(t, arg)
-			if ok then
-				return true, cast_arg
-			end
-		end
-	end
-
-	if expected == M.TYPE_NUMBER and given == M.TYPE_STRING then
-		local str = tonumber(arg)
-		if str then
-			return true, str
-		end
-	elseif expected == M.TYPE_URL and given == M.TYPE_STRING then
+---@param string string
+---@param type Type
+---@return any?
+local function cast_from_string(string, type)
+	if type == M.TYPE_NUMBER then
+		return tonumber(string)
+	elseif type == M.TYPE_HASH then
+		return hash(string)
+	elseif type == M.TYPE_URL then
 		local ok, url = pcall(msg.url, arg)
 		if ok then
-			return true, url
+			return url
 		end
-	elseif expected == M.TYPE_HASH and given == M.TYPE_STRING then
-		return true, hash(arg)
+	end
+end
+
+---@param parameter Parameter
+---@param argument any
+---@return boolean,any?
+local function arg_is_valid(parameter, argument)
+	local given = get_type(argument)
+
+	local expected = parameter.type
+	if given == expected then return true end
+
+	if given == M.TYPE_NIL and parameter.optional then return true end
+
+	if given == M.TYPE_STRING then
+		local cast_arg = cast_from_string(argument, expected)
+		if cast_arg then
+			return true, cast_arg
+		end
 	end
 
 	return false
 end
 
+---@param i number
+---@param parameter Parameter
+---@param argument any
+---@return string
+local function incorrect_type_error(i, parameter, argument)
+	local expected = parameter.type.description
+	local given = get_type(argument).description
+
+	return ("Argument #%i must be %s, not %s"):format(i, expected, given)
+end
+
 ---@param command Command
 ---@param args any[]
----@returns boolean
+---@returns boolean,string?
 local function check_args(command, args)
-	for i, expected in ipairs(command.arguments) do
-		local given = arg_type(args[i])
-		local ok, cast_arg = arg_matches(expected, args[i])
+	for i, parameter in ipairs(command.parameters)  do
+		local ok, cast_arg = arg_is_valid(parameter, args[i])
 		if not ok then
-			return false, ("Argument #%i must be %s, not %s"):format(i, expected.desc, given.desc)
+			return false, incorrect_type_error(i, parameter, args[i])
 		elseif cast_arg then
 			args[i] = cast_arg
 		end
@@ -266,7 +233,7 @@ end
 ---@param command Command
 ---@return boolean
 local function requires_inspector(command)
-	return has_arg_type(command.arguments, M.TYPE_URL)
+	return contains_type(command.parameters, M.TYPE_URL)
 end
 
 ---@param args any[]
@@ -364,7 +331,7 @@ function M.run_command(command, args)
 	end
 
 	if type(command) ~= "table" then
-		return M.error("Command must be a table or a string, not " .. arg_type(command).name, COMMANDER)
+		return M.error("Command must be a table or a string, not " .. get_type(command).description, COMMANDER)
 	end
 	
 	local ok, err = check_args(command, args)

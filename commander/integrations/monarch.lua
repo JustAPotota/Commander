@@ -14,8 +14,12 @@ local commands = {
 		name = "monarch.show",
 		aliases = {},
 		description = "Show the Monarch screen of the given ID",
-		arguments = {
-			commander.TYPE_STRING
+		parameters = {
+			{
+				name = "id",
+				description = "ID of the Monarch screen to show",
+				type = commander.TYPE_HASH
+			}
 		},
 		run = function(args)
 			monarch.show(args[1])
@@ -25,8 +29,12 @@ local commands = {
 		name = "monarch.hide",
 		aliases = {},
 		description = "Hide the Monarch screen of the given ID",
-		arguments = {
-			commander.TYPE_STRING
+		parameters = {
+			{
+				name = "id",
+				description = "ID of the Monarch screen to hide",
+				type = commander.TYPE_HASH
+			}
 		},
 		run = function(args)
 			monarch.hide(args[1])
@@ -36,7 +44,7 @@ local commands = {
 		name = "monarch.clear",
 		aliases = {},
 		description = "Hide all Monarch screens",
-		arguments = {},
+		parameters = {},
 		run = function()
 			monarch.clear()
 		end
@@ -45,8 +53,13 @@ local commands = {
 		name = "monarch.top",
 		aliases = {},
 		description = "Print the ID of the screen at the top of the stack",
-		arguments = {
-			commander.TYPE_OPTIONAL(commander.TYPE_NUMBER)
+		parameters = {
+			{
+				name = "offset",
+				description = "Optional offset from the top of the stack",
+				type = commander.TYPE_NUMBER,
+				optional = true
+			}
 		},
 		run = function(args)
 			local offset = args[1]
