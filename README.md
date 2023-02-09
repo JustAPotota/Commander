@@ -64,7 +64,7 @@ Exit the game.
 **Arguments**:
 - code (`string`) - Lua code to run
 
-Executs the given string as a Lua function using [`loadstring()`](https://www.lua.org/manual/5.1/manual.html#pdf-loadstring). If multiple arguments are passed, they'll be concatenated by spaces.
+Executes the given string as a Lua function using [`loadstring()`](https://www.lua.org/manual/5.1/manual.html#pdf-loadstring). If multiple arguments are passed, they'll be concatenated by spaces.
 
 ### **`get_pos`**
 **Arguments**
