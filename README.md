@@ -4,7 +4,8 @@ A debug console and command system for the [Defold game engine](https://www.defo
 # Contents
 1. [**Installation**](#installation)
 2. [**Usage**](#usage)
-3. [**Built-in Commands**](#built-in-commands)
+3. [**Built-in Commands**](/COMMANDS.md)
+4. [**API Reference**](#api-reference)
 
 # Installation
 You can use Commander in your own project by adding it as a [Defold library dependency](https://defold.com/manuals/libraries/). Open your `game.project` file and under `Project > Dependencies` add:
@@ -49,56 +50,11 @@ _Press the grave/backtick key (`) to toggle the console._
 
 Some commands (like the built-in [`get_pos`](#get_pos) command) need to access objects and components using the [`go`](https://defold.com/ref/stable/go/) functions, but those don't work between collections. To get around this, add `/commander/inspector.go` to each of your collections so Commander can access them. You only need to add it to collections that are loaded through proxies, also called "sockets" or "game worlds".
 
-# Built-in Commands
-_You can view this list in-game via the [`help`](#help) command._
-
-## **Commander**
-## help
-List all available commands.
-
-## exit/quit
-Exit the game.
-
-## lua/run `code`
-**Arguments**:
-- code (`string`) - Lua code to run
-
-Executes the given string as a Lua function using [`loadstring()`](https://www.lua.org/manual/5.1/manual.html#pdf-loadstring). If multiple arguments are passed, they'll be concatenated by spaces.
-
-## get_pos `url`
-**Arguments**
-- url (`URL`) - Game object to get the position of
-
-Print the position of the given game object.
-
-## **Monarch**
-## monarch.show `id`
-**Arguments**:
-- id (`string`) - ID of the Monarch screen to show
-
-Show the Monarch screen of the given ID.
-
-## monarch.hide `id`
-**Arguments**:
-- id (`string`) - ID of the Monarch screen to hide
-
-Hide the Monarch screen of the given ID.
-
-## monarch.clear
-Hide all Monarch screens.
-
-## monarch.top `offset`
-**Arguments**:
-- offset (`number?`) - Optional offset from the top of the stack
-
-Print the ID of the screen at the top of the stack.
-
 # API Reference
 
 ## commander.init()
 Takes care of any initialization that needs to be done, like setting up integrations and the log listener extension (if `commander.capture_logs` is set). 
 
----
 ## commander.run_command(`command`, `args`)
 **Arguments**:
 - command (`Command` | `string`) - Either a Command table or the name of a command
