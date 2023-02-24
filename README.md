@@ -53,43 +53,41 @@ Some commands (like the built-in [`get_pos`](#get_pos) command) need to access o
 _You can view this list in-game via the [`help`](#help) command._
 
 ## **Commander**
----
-### **`help`**
+## help
 List all available commands.
 
-### **`exit`**`, quit`
+## exit/quit
 Exit the game.
 
-### **`lua`**`, run`
+## lua/run `code`
 **Arguments**:
 - code (`string`) - Lua code to run
 
 Executes the given string as a Lua function using [`loadstring()`](https://www.lua.org/manual/5.1/manual.html#pdf-loadstring). If multiple arguments are passed, they'll be concatenated by spaces.
 
-### **`get_pos`**
+## get_pos `url`
 **Arguments**
 - url (`URL`) - Game object to get the position of
 
 Print the position of the given game object.
 
 ## **Monarch**
----
-### **`monarch.show`**
+## monarch.show `id`
 **Arguments**:
 - id (`string`) - ID of the Monarch screen to show
 
 Show the Monarch screen of the given ID.
 
-### **`monarch.hide`**
+## monarch.hide `id`
 **Arguments**:
 - id (`string`) - ID of the Monarch screen to hide
 
 Hide the Monarch screen of the given ID.
 
-### **`monarch.clear`**
+## monarch.clear
 Hide all Monarch screens.
 
-### **`monarch.top`**
+## monarch.top `offset`
 **Arguments**:
 - offset (`number?`) - Optional offset from the top of the stack
 
@@ -97,10 +95,11 @@ Print the ID of the screen at the top of the stack.
 
 # API Reference
 
-### **`commander.init()`**
+## commander.init()
 Takes care of any initialization that needs to be done, like setting up integrations and the log listener extension (if `commander.capture_logs` is set). 
 
-### **`commander.run_command(command, args)`**
+---
+## commander.run_command(`command`, `args`)
 **Arguments**:
 - command (`Command` | `string`) - Either a Command table or the name of a command
 - args (`any[]`) - Arguments to be passed to the command
@@ -114,7 +113,7 @@ commander.run("help")
 commander.run("get_pos", { "my_go" })
 ```
 
-### **`commander.get_command(name)`**
+## commander.get_command(`name`)
 **Arguments**:
 - name (`string`) - Name of the command
 
@@ -123,29 +122,30 @@ commander.run("get_pos", { "my_go" })
 
 Searches for the command with the given name in `commander.commands` and returns it if it was found, or `nil` if it wasn't.
 
-### **`commander.register_commands(commands, domain)`**
+## commander.register_commands(`commands`, `domain`)
 **Arguments**:
 - commands (`Command[]`) - Array of commands to register
 - domain (`string`) - Human-readable name for this group of commands, e.g. `"Commander"` or `"Monarch"`
 
 Adds a new command set to `commander.commands` with the given commands and domain.
 
-### **`commander.register_console(url)`**
+## commander.register_console(`url`)
 **Arguments**:
 - url (`url`) - Address of the console script
 
 Registers the given script as a console. See the section on consoles for more information.
 
-### **`commander.register_inspector(url)`**
+## commander.register_inspector(`url`)
 **Arguments**:
 - url (`url`) - Address of the inspector script
 
 Registers the given script as an inspector. Only intended to be used by `/commander/inspector.go`.
 
-### **`commander.debug(text, domain)`**
-### **`commander.info(text, domain)`**
-### **`commander.warning(text, domain)`**
-### **`commander.error(text, domain, disable_traceback)`**
+---
+### commander.debug(`text`, `domain`)
+### commander.info(`text`, `domain`)
+### commander.warning(`text`, `domain`)
+### commander.error(`text`, `domain`, `disable_traceback`)
 **Arguments**:
 - text (`string`) - Message to log
 - domain (`string?`) - Optional name to prepend to the message, e.g. `"SCRIPT"` or `"COMMANDER"`
