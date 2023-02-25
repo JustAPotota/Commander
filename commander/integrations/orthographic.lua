@@ -10,10 +10,42 @@ end
 
 local ORTHOGRAPHIC = "ORTHOGRAPHIC"
 
+local PARAM_CAMERA_ID = {
+	name = "id",
+	description = "ID of the camera to use. Not required if there's only one",
+	type = commander.TYPE_HASH,
+	optional = true
+}
+
+---Returns whether or not the given camera exists, also logging an error if it doesn't.
+---@param camera_id hash
+---@return bool
+local function valid_camera(camera_id)
+	local ok, _ = pcall(ortho.get_zoom, camera_id)
+	if not ok then
+		commander.error("Invalid camera ID '" .. tostring(camera_id) .. "'. Use 'ortho.get_cameras' to list valid IDs", ORTHOGRAPHIC)
+	end
+	return ok
+end
+
+local function make_get_command(fn_name, description)
+	return {
+		name = fn_name,
+		aliases = {},
+		summary = "Print the " .. description .. " of the given camera",
+		parameters = { PARAM_CAMERA_ID },
+		run = function(args)
+			local camera_id = args[1]
+			if not valid_camera(camera_id) then return end
+			commander.info(tostring(ortho[fn_name](camera_id)), ORTHOGRAPHIC)
+		end
+	}
+end
+
 ---@type Command[]
 local commands = {
 	{
-		name = "ortho.get_cameras",
+		name = "get_cameras",
 		aliases = {},
 		summary = "Print a list of all camera IDs",
 		parameters = {},
@@ -25,24 +57,25 @@ local commands = {
 			commander.info("}")
 		end
 	},
+	make_get_command("get_view", "view matrix"),
+	make_get_command("get_viewport", "viewport"),
+	make_get_command("get_projection", "projection matrix"),
+	make_get_command("get_zoom", "zoom level"),
+	make_get_command("get_projection_id", "projection ID"),
 	{
-		name = "ortho.get_zoom",
+		name = "shake",
 		aliases = {},
-		summary = "Print the zoom level of the given camera",
+		summary = "Shake the given camera",
 		parameters = {
-			{
-				name = "id",
-				description = "ID of the camera to use. Not required if there's only one",
-				type = commander.TYPE_HASH,
-				optional = true
-			}
+			PARAM_CAMERA_ID,
 		},
 		run = function(args)
-			commander.info(tostring(ortho.get_zoom(args[1])), ORTHOGRAPHIC)
+			if not valid_camera(args[1]) then return end
+			ortho.shake(args[1])
 		end
 	},
 	{
-		name = "ortho.set_zoom",
+		name = "set_zoom",
 		aliases = {},
 		summary = "Set the zoom level of the given camera",
 		parameters = {
@@ -51,17 +84,13 @@ local commands = {
 				description = "Zoom level to set",
 				type = commander.TYPE_NUMBER
 			},
-			{
-				name = "id",
-				description = "ID of the camera to use. Not required if there's only one",
-				type = commander.TYPE_HASH,
-				optional = true
-			}
+			PARAM_CAMERA_ID
 		},
 		run = function(args)
+			if not valid_camera(args[2]) then return end
 			ortho.set_zoom(args[2], args[1])
 		end
 	}
 }
 
-commander.register_commands(commands, "Orthographic")
+commander.register_commands(commands, "Orthographic", "ortho")

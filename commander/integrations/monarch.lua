@@ -11,7 +11,7 @@ end
 ---@type Command[]
 local commands = {
 	{
-		name = "monarch.show",
+		name = "show",
 		aliases = {},
 		summary = "Show the Monarch screen of the given ID",
 		parameters = {
@@ -26,7 +26,7 @@ local commands = {
 		end
 	},
 	{
-		name = "monarch.hide",
+		name = "hide",
 		aliases = {},
 		summary = "Hide the Monarch screen of the given ID",
 		parameters = {
@@ -41,7 +41,7 @@ local commands = {
 		end
 	},
 	{
-		name = "monarch.clear",
+		name = "clear",
 		aliases = {},
 		summary = "Hide all Monarch screens",
 		parameters = {},
@@ -50,7 +50,7 @@ local commands = {
 		end
 	},
 	{
-		name = "monarch.top",
+		name = "top",
 		aliases = {},
 		summary = "Print the ID of the screen at the top of the stack",
 		parameters = {
@@ -68,4 +68,4 @@ local commands = {
 	}
 }
 
-commander.register_commands(commands, "Monarch")
+commander.register_commands(commands, "Monarch", "monarch")

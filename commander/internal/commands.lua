@@ -9,11 +9,16 @@ return {
 		run = function(args)
 			commander.info("Available commands:")
 			for _, set in ipairs(commander.commands) do
-				commander.info(set.domain)
+				commander.info(set.name)
 				for _, command in ipairs(set.commands) do
-					local name = command.name
+					local prefix = ""
+					if set.prefix then
+						prefix = set.prefix .. "."
+					end
+					
+					local name = prefix .. command.name
 					if #command.aliases > 0 then
-						name = name .. ", " .. table.concat(command.aliases, ", ")
+						name = name .. ", " .. prefix .. table.concat(command.aliases, ", ")
 					end
 
 					local params = ""

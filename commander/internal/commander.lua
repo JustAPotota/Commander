@@ -23,7 +23,8 @@ M.MESSAGE_RUN_COMMAND = hash("run_command")
 ---@field description string
 
 ---@class CommandSet
----@field domain string
+---@field name string
+---@field prefix string
 ---@field commands Command[]
 
 ---@type Type
@@ -275,9 +276,14 @@ end
 function M.get_command(name)
 	for _, set in ipairs(M.commands) do
 		for _, command in ipairs(set.commands) do
-			if name == command.name then return command end
+			local prefix = ""
+			if set.prefix then
+				prefix = set.prefix .. "."
+			end
+
+			if name == prefix .. command.name then return command end
 			for _, alias in ipairs(command.aliases) do
-				if name == alias then return command end
+				if name == prefix .. alias then return command end
 			end
 		end
 	end
@@ -369,27 +375,29 @@ function M.register_inspector(url)
 	M.info("Registered new inspector with " .. tostring(url), COMMANDER)
 end
 
----@param domain string
+---@param name string
 ---@return CommandSet?
-local function find_command_set(domain)
+local function find_command_set(name)
 	for _, set in ipairs(M.commands) do
-		if set.domain == domain then
+		if set.name == name then
 			return set
 		end
 	end
 end
 
 ---@param commands Command[]
----@param domain string
-function M.register_commands(commands, domain)
-	local set = find_command_set(domain)
+---@param group_name string
+---@param prefix string?
+function M.register_commands(commands, group_name, prefix)
+	local set = find_command_set(group_name)
 	if set then
 		for _, command in ipairs(commands) do
 			table.insert(set.commands, command)
 		end
 	else
 		local new_set = {
-			domain = domain,
+			name = group_name,
+			prefix = prefix,
 			commands = commands
 		}
 		table.insert(M.commands, new_set)
