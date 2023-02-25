@@ -83,7 +83,7 @@ extern "C" void dmHashEnableReverseHash(bool enable);
 static dmExtension::Result AppInit(dmExtension::AppParams *params)
 {
 	dmConfigFile::HConfig config = dmEngine::GetConfigFile(params);
-	int32_t reverseHash = dmConfigFile::GetInt(config, "commander.reverse_hash", 1);
+	int32_t reverseHash = dmConfigFile::GetInt(config, "commander.enable_reverse_hash", 1);
 	if (reverseHash) {
 		dmHashEnableReverseHash(true);
 	}
