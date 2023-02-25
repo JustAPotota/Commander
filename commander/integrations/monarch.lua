@@ -9,6 +9,8 @@ else
 	commander.info("Adding Monarch integration", "COMMANDER")
 end
 
+local MONARCH = "MONARCH"
+
 local screens = utils.find_upvalue(monarch.screen_exists, "screens")
 
 ---@type Command[]
@@ -66,16 +68,20 @@ local commands = {
 		},
 		run = function(args)
 			local offset = args[1]
-			commander.info("Top screen: " .. tostring(monarch.top(offset)), "MONARCH")
+			commander.info("Top screen: " .. tostring(monarch.top(offset)), MONARCH)
 		end
 	},
 	{
 		name = "screens",
 		aliases = {},
-		summary = "Print info about all registered screens",
+		summary = "Print the IDs of all registered screens",
 		parameters = {},
 		run = function()
-			pprint(screens)
+			commander.info("{", MONARCH)
+			for id, properties in pairs(screens) do
+				commander.info("  " .. tostring(id) .. ",")
+			end
+			commander.info("}")
 		end
 	}
 }
