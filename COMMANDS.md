@@ -22,7 +22,7 @@ Execute the given string as a Lua function using loadstring(). If multiple argum
 Print the position of the given game object.
 ## generate_docs
 
-Write command documentation to 'COMMANDS.generated.md'
+Write command documentation to 'COMMANDS.generated.md'.
 # **Monarch**
 ## monarch.show `id`
 

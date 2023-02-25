@@ -3,7 +3,7 @@ local commander = require("commander.internal.commander")
 ---@param s string
 ---@return string
 local function add_period(s)
-	if s:sub( -1, -1):find("%a") then
+	if not s:sub( -1, -1):find("[%.%?!]") then
 		s = s .. "."
 	end
 	return s
