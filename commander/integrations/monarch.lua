@@ -1,4 +1,5 @@
 local commander = require("commander.internal.commander")
+local utils = require("commander.internal.utils")
 local _, monarch = pcall(require, "monarch.monarch")
 
 if type(monarch) ~= "table" then
@@ -7,6 +8,8 @@ if type(monarch) ~= "table" then
 else
 	commander.info("Adding Monarch integration", "COMMANDER")
 end
+
+local screens = utils.find_upvalue(monarch.screen_exists, "screens")
 
 ---@type Command[]
 local commands = {
@@ -64,6 +67,15 @@ local commands = {
 		run = function(args)
 			local offset = args[1]
 			commander.info("Top screen: " .. tostring(monarch.top(offset)), "MONARCH")
+		end
+	},
+	{
+		name = "screens",
+		aliases = {},
+		summary = "Print info about all registered screens",
+		parameters = {},
+		run = function()
+			pprint(screens)
 		end
 	}
 }
