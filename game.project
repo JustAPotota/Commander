@@ -23,6 +23,7 @@ repeat_interval = 0.02
 
 [commander]
 capture_logs = 1
+reverse_hash = 1
 
 [library]
 include_dirs = commander

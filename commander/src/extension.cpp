@@ -78,12 +78,23 @@ static void LogListener(LogSeverity severity, const char *domain, const char *me
 	}
 }
 
+extern "C" void dmHashEnableReverseHash(bool enable);
+
+static dmExtension::Result AppInit(dmExtension::AppParams *params)
+{
+	dmConfigFile::HConfig config = dmEngine::GetConfigFile(params);
+	int32_t reverseHash = dmConfigFile::GetInt(config, "commander.reverse_hash", 1);
+	if (reverseHash) {
+		dmHashEnableReverseHash(true);
+	}
+	return dmExtension::RESULT_OK;
+}
+
 static dmExtension::Result ExtInit(dmExtension::Params *params)
 {
 	LuaInit(params->m_L);
 	dmLog::RegisterLogListener(LogListener);
-	dmLogInfo("Test");
 	return dmExtension::RESULT_OK;
 }
 
-DM_DECLARE_EXTENSION(CommanderExt, LIB_NAME, 0, 0, ExtInit, 0, 0, 0)
+DM_DECLARE_EXTENSION(CommanderExt, LIB_NAME, AppInit, 0, ExtInit, 0, 0, 0)
