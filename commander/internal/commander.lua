@@ -170,7 +170,7 @@ end
 ---@param args any[]
 ---@returns boolean,string?
 local function check_args(command, args)
-	for i, parameter in ipairs(command.parameters)  do
+	for i, parameter in ipairs(command.parameters) do
 		local ok, cast_arg = arg_is_valid(parameter, args[i])
 		if not ok then
 			return false, incorrect_type_error(i, parameter, args[i])
@@ -347,7 +347,7 @@ function M.run_command(command, args)
 	if type(command) ~= "table" then
 		return M.error("Command must be a table or a string, not " .. get_type(command).description, COMMANDER)
 	end
-	
+
 	local ok, err = check_args(command, args)
 	if not ok then
 		return M.error(err, COMMANDER)
@@ -356,7 +356,7 @@ function M.run_command(command, args)
 	if not requires_inspector(command) then
 		return run_command(command, args)
 	end
-	
+
 	run_with_inspector(command, args)
 end
 

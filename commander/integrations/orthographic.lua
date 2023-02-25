@@ -23,7 +23,8 @@ local PARAM_CAMERA_ID = {
 local function valid_camera(camera_id)
 	local ok, _ = pcall(ortho.get_zoom, camera_id)
 	if not ok then
-		commander.error("Invalid camera ID '" .. tostring(camera_id) .. "'. Use 'ortho.get_cameras' to list valid IDs", ORTHOGRAPHIC)
+		commander.error("Invalid camera ID '" .. tostring(camera_id) .. "'. Use 'ortho.get_cameras' to list valid IDs",
+			ORTHOGRAPHIC)
 	end
 	return ok
 end

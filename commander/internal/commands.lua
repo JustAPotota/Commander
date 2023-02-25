@@ -15,7 +15,7 @@ return {
 					if set.prefix then
 						prefix = set.prefix .. "."
 					end
-					
+
 					local name = prefix .. command.name
 					if #command.aliases > 0 then
 						name = name .. ", " .. prefix .. table.concat(command.aliases, ", ")
@@ -52,7 +52,7 @@ return {
 			{
 				name = "code",
 				description = "Lua code to run",
-				type = commander.TYPE_STRING 
+				type = commander.TYPE_STRING
 			}
 		},
 		run = function(args)

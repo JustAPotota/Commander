@@ -62,7 +62,7 @@ end
 
 local function update_cursor(self)
 	local prompt_text = "> " .. self.input
-	prompt_text = prompt_text:sub(1, 2+self.cursor_index)
+	prompt_text = prompt_text:sub(1, 2 + self.cursor_index)
 
 	local prompt_width = text_metrics(self, prompt_text:gsub("%s", "_")).width
 	gui.animate(self.cursor_node, "position.x", prompt_width, gui.EASING_OUTSINE, 0.05)
@@ -87,7 +87,7 @@ end
 
 local function insert_text(self, text)
 	local new_input = self.input:sub(1, self.cursor_index) .. text .. self.input:sub(self.cursor_index + 1, -1)
-	if self.cursor_index < #self.input-1 then
+	if self.cursor_index < #self.input - 1 then
 		self.cursor_index = self.cursor_index + #text
 	end
 	set_input(self, new_input)
@@ -142,7 +142,6 @@ function on_message(self, message_id, message, sender)
 	end
 end
 
-
 local function enable_cursor(self, enabled)
 	if enabled then
 		blink_cursor(self)
@@ -182,7 +181,7 @@ function on_input(self, action_id, action)
 			if self.cursor_index > 0 then
 				local old_index = self.cursor_index
 				self.cursor_index = self.cursor_index - 1
-				set_input(self, self.input:sub(1, old_index-1) .. self.input:sub(old_index+1))
+				set_input(self, self.input:sub(1, old_index - 1) .. self.input:sub(old_index + 1))
 			end
 		elseif action_id == hash("key_enter") and action.pressed then
 			local args = split(self.input)
