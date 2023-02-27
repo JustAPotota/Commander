@@ -50,6 +50,19 @@ _Press the grave/backtick key (`) to toggle the console._
 
 Some commands (like the built-in [`get_pos`](#get_pos) command) need to access objects and components using the [`go`](https://defold.com/ref/stable/go/) functions, but those don't work between collections. To get around this, add `/commander/inspector.go` to each of your collections so Commander can access them. You only need to add it to collections that are loaded through proxies, also called "sockets" or "game worlds".
 
+# Project Settings
+Paste the following into your `game.project` file:
+```ini
+[commander]
+# Show messages from Defold's console in Commander
+capture_logs = 1
+
+# Force-enable the ability to print hashes, even in release builds
+# If disabled, hashes will be displayed as '<unknown>'
+enable_reverse_hash = 1
+```
+Set an option to `0` to disable it. If not specified, both options will be enabled (recommended).
+
 # API Reference
 
 ## commander.init()
