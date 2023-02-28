@@ -1,4 +1,5 @@
-local commander = require("commander.internal.commander")
+return function(commander)
+
 local _, ortho = pcall(require, "orthographic.camera")
 
 if type(ortho) ~= "table" then
@@ -16,6 +17,7 @@ local PARAM_CAMERA_ID = {
 	type = commander.TYPE_HASH,
 	optional = true
 }
+
 
 ---Returns whether or not the given camera exists, also logging an error if it doesn't.
 ---@param camera_id hash
@@ -94,4 +96,6 @@ local commands = {
 	}
 }
 
-commander.register_commands(commands, "Orthographic", "ortho")
+return commands
+
+end

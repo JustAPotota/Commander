@@ -4,7 +4,8 @@
 	"Lua.completion.callSnippet": "Replace",
 	"Lua.runtime.version": "Lua 5.1",
 	"Lua.workspace.library": [
-		".defold"
+		".defold/api",
+		".defold/assets"
 	],
 	"Lua.diagnostics.libraryFiles": "Disable",
 	"Lua.workspace.ignoreDir": [

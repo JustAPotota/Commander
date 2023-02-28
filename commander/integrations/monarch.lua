@@ -1,4 +1,5 @@
-local commander = require("commander.internal.commander")
+return function(commander)
+
 local utils = require("commander.internal.utils")
 local _, monarch = pcall(require, "monarch.monarch")
 
@@ -86,4 +87,6 @@ local commands = {
 	}
 }
 
-commander.register_commands(commands, "Monarch", "monarch")
+return commands
+
+end

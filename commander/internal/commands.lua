@@ -1,4 +1,4 @@
-local commander = require("commander.internal.commander")
+return function(commander)
 
 ---@param s string
 ---@return string
@@ -32,7 +32,7 @@ return {
 
 					local params = ""
 					for _, parameter in ipairs(command.parameters) do
-						params = params .. " " .. parameter.type.name .. (parameter.optional and "?" or "")
+						params = params .. (" <%s%s>"):format(parameter.name, (parameter.optional and "?" or ""))
 					end
 
 					local full_name = name .. params
@@ -133,3 +133,5 @@ return {
 		end
 	}
 }
+
+end
