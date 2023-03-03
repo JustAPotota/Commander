@@ -58,7 +58,8 @@
 		"*.texture_profiles": "textproto",
 		"*.tilemap": "textproto",
 		"*.tilesource": "textproto",
-		"*.appmanifest": "yaml"
+		"*.appmanifest": "yaml",
+		"system_error": "cpp"
 	},
 	"search.exclude": {
 		"**/node_modules": true,

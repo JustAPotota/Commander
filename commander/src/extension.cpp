@@ -8,8 +8,17 @@ dmScript::LuaCallbackInfo *infoCb;
 dmScript::LuaCallbackInfo *warningCb;
 dmScript::LuaCallbackInfo *errorCb;
 
-static int SetListeners(lua_State *L)
+struct Message
 {
+	LogSeverity severity;
+	const char *domain;
+	const char *message;
+};
+
+dmArray<Message> messageQueue;
+dmMutex::HMutex queueMutex = dmMutex::New();
+
+static int SetListeners(lua_State *L) {
 	DM_LUA_STACK_CHECK(L, 0);
 
 	debugCb = dmScript::CreateCallback(L, 1);
@@ -33,8 +42,7 @@ static const luaL_reg Module_methods[] = {
 	{0, 0}
 };
 
-static void LuaInit(lua_State *L)
-{
+static void LuaInit(lua_State *L) {
 	int top = lua_gettop(L);
 
 	// Register lua names
@@ -44,16 +52,15 @@ static void LuaInit(lua_State *L)
 	assert(top == lua_gettop(L));
 }
 
-static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const char *message, size_t severity_length)
-{
+static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const char *message, size_t severity_length) {
 	if (!dmScript::IsCallbackValid(cb))
 		return;
 
 	lua_State *L = dmScript::GetCallbackLuaContext(cb);
 	DM_LUA_STACK_CHECK(L, 0);
 
-	if (!dmScript::SetupCallback(cb))
-	{
+	if (!dmScript::SetupCallback(cb)) {
+		dmLogError("Failed to set up callback");
 		return;
 	}
 
@@ -64,37 +71,77 @@ static void RunCallback(dmScript::LuaCallbackInfo *cb, const char *domain, const
 	dmScript::TeardownCallback(cb);
 }
 
-static void LogListener(LogSeverity severity, const char *domain, const char *message)
-{
+static void DispatchMessage(LogSeverity severity, const char *domain, const char *message) {
 	if (severity <= LOG_SEVERITY_USER_DEBUG)
 	{
 		RunCallback(debugCb, domain, message, 5);
-	} else if (severity == LOG_SEVERITY_INFO) {
+	}
+	else if (severity == LOG_SEVERITY_INFO)
+	{
 		RunCallback(infoCb, domain, message, 4);
-	} else if (severity == LOG_SEVERITY_WARNING) {
+	}
+	else if (severity == LOG_SEVERITY_WARNING)
+	{
 		RunCallback(warningCb, domain, message, 7);
-	} else if (severity >= LOG_SEVERITY_ERROR) {
+	}
+	else if (severity >= LOG_SEVERITY_ERROR)
+	{
 		RunCallback(errorCb, domain, message, 5);
 	}
 }
 
+static void AddToQueue(LogSeverity severity, const char *domain, const char *formatted_message) {
+	DM_MUTEX_SCOPED_LOCK(queueMutex);
+
+	if (messageQueue.Full())
+		messageQueue.OffsetCapacity(2);
+
+	Message message = {severity, strdup(domain), strdup(formatted_message)};
+	messageQueue.Push(message);
+}
+
+static void FlushQueue() {
+    dmArray<Message> temp;
+    {
+        DM_MUTEX_SCOPED_LOCK(queueMutex);
+        temp.Swap(messageQueue);
+    }
+
+    for (uint32_t i = 0; i < temp.Size(); i++) {
+		Message message = temp[i];
+        DispatchMessage(message.severity, message.domain, message.message);
+    }
+}
+
+static void LogListener(LogSeverity severity, const char *domain, const char *formatted_message) {
+	AddToQueue(severity, domain, formatted_message);
+}
+
 extern "C" void dmHashEnableReverseHash(bool enable);
 
-static dmExtension::Result AppInit(dmExtension::AppParams *params)
-{
+static dmExtension::Result AppInit(dmExtension::AppParams *params) {
 	dmConfigFile::HConfig config = dmEngine::GetConfigFile(params);
+	int32_t captureLogs = dmConfigFile::GetInt(config, "commander.capture_logs", 1);
 	int32_t reverseHash = dmConfigFile::GetInt(config, "commander.enable_reverse_hash", 1);
-	if (reverseHash) {
+
+	if (captureLogs)
+		dmLogRegisterListener(LogListener);
+	if (reverseHash)
 		dmHashEnableReverseHash(true);
-	}
+
 	return dmExtension::RESULT_OK;
 }
 
-static dmExtension::Result ExtInit(dmExtension::Params *params)
-{
+static dmExtension::Result ExtInit(dmExtension::Params *params) {
 	LuaInit(params->m_L);
-	dmLog::RegisterLogListener(LogListener);
 	return dmExtension::RESULT_OK;
 }
 
-DM_DECLARE_EXTENSION(CommanderExt, LIB_NAME, AppInit, 0, ExtInit, 0, 0, 0)
+static dmExtension::Result OnUpdate(dmExtension::Params *params) {
+	if (!messageQueue.Empty() && debugCb)
+		FlushQueue();
+
+	return dmExtension::RESULT_OK;
+}
+
+DM_DECLARE_EXTENSION(CommanderExt, LIB_NAME, AppInit, 0, ExtInit, OnUpdate, 0, 0)
