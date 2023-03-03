@@ -17,9 +17,10 @@ Or point to the ZIP file of a specific release such as:
 
 # Usage
 ### TL;DR:
-- Import `commander.commander` into a script and run `commander.init()`
-- Add `/commander/console.go` to your boostrap collection
-- Add `/commander/inspector.go` to your other collections
+- Import the module via `local commander = require("commander.commander")` and run `commander.init()`
+- Add `console.go` to your boostrap collection
+  - Or `imgui_console.go` if you're using the [ImGUI extension](https://github.com/britzl/extension-imgui)
+- Add `inspector.go` to your other collections
 - Use `/builtins/input/all.input_binding` or add the following bindings:
   - Backspace -> `key_backspace`
   - Enter -> `key_enter`
