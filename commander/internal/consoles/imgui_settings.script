@@ -1,0 +1,7 @@
+go.property("default_window_size", vmath.vector3(640, 480, 0))
+
+function init(self)
+	msg.post(".", "settings", {
+		default_window_size = self.default_window_size
+	})
+end

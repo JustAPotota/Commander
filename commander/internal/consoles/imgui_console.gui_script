@@ -1,0 +1,86 @@
+local commander = require("commander.commander")
+
+local COLORS = {
+	[commander.SEVERITY.DEBUG] = vmath.vector4(0.2, 0.6, 0.9, 1),
+	[commander.SEVERITY.INFO] = vmath.vector4(1, 1, 1, 1),
+	[commander.SEVERITY.WARNING] = vmath.vector4(0.8, 0.8, 0.3, 1),
+	[commander.SEVERITY.ERROR] = vmath.vector4(0.9, 0.3, 0.3, 1)
+}
+
+local function split(s)
+	local matches = {}
+	for match in s:gmatch("[^%s]+") do
+		table.insert(matches, match)
+	end
+	return matches
+end
+
+function init(self)
+	if not imgui then
+		error("This console requires the ImGUI extension (https://github.com/britzl/extension-imgui). Please add it to your project or use a different console.")
+		return
+	end
+
+	if not imgui.get_window_size then
+		error("This console requires a newer version of the ImGUI extension. Please update it or use a different console.")
+		return
+	end
+
+	commander.register_console(msg.url())
+
+	self.messages = {}
+	self.reset_window_size = false
+	self.default_window_size = { 640, 480 }
+end
+
+function update(self, dt)
+	if not imgui then return end
+
+	if self.reset_window_size then
+		imgui.set_next_window_size(unpack(self.default_window_size))
+		self.reset_window_size = false
+	end
+
+	imgui.begin_window("Commander")
+
+	local width, height = imgui.get_window_size()
+	if width + height < 200 then self.reset_window_size = true end
+
+	imgui.begin_child("Output", 0, -27)
+	for _, message in ipairs(self.messages) do
+		local domain = message.domain and message.domain .. ": " or ""
+		imgui.text_colored(domain .. message.text, message.color.x, message.color.y, message.color.z, message.color.w)
+	end
+	imgui.end_child()
+
+	imgui.separator()
+
+	imgui.text(">")
+	imgui.same_line()
+	local entered, text = imgui.input_text("", "", imgui.INPUTFLAGS_ENTERRETURNSTRUE)
+	if entered then
+		commander.info("> " .. text)
+		local args = split(text)
+		local command_name = table.remove(args, 1)
+		commander.run_command(command_name, args)
+	end
+
+	imgui.end_window()
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("new_message") then
+		table.insert(self.messages, {
+			text = message.text,
+			domain = message.domain,
+			color = COLORS[message.severity]
+		})
+
+		if #self.messages > 1024 then
+			table.remove(self.messages, 1)
+		end
+	elseif message_id == hash("settings") then
+		local size = message.default_window_size
+		self.default_window_size = { size.x, size.y }
+	end
+end

@@ -1,6 +1,6 @@
 components {
   id: "console"
-  component: "/commander/internal/console.gui"
+  component: "/commander/internal/consoles/console.gui"
   position {
     x: 0.0
     y: 0.0

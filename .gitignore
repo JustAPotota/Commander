@@ -10,3 +10,4 @@ Thumbs.db
 builtins
 /.defold
 /COMMANDS.generated.md
+/imgui.ini

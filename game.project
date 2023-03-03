@@ -16,6 +16,7 @@ input_method = HiddenInputField
 title = Commander
 dependencies#0 = https://github.com/britzl/monarch/archive/refs/tags/3.7.0.zip
 dependencies#1 = https://github.com/britzl/defold-orthographic/archive/refs/tags/3.2.1.zip
+dependencies#2 = https://github.com/britzl/extension-imgui/archive/refs/heads/master.zip
 
 [input]
 game_binding = /builtins/input/all.input_bindingc
