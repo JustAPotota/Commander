@@ -15,6 +15,10 @@ local function split(s)
 	return matches
 end
 
+local function colored_text(text, color)
+	imgui.text_colored(text, color.x, color.y, color.z, color.w)
+end
+
 function init(self)
 	if not imgui then
 		error("This console requires the ImGUI extension (https://github.com/britzl/extension-imgui). Please add it to your project or use a different console.")
@@ -49,7 +53,7 @@ function update(self, dt)
 	imgui.begin_child("Output", 0, -27)
 	for _, message in ipairs(self.messages) do
 		local domain = message.domain and message.domain .. ": " or ""
-		imgui.text_colored(domain .. message.text, message.color.x, message.color.y, message.color.z, message.color.w)
+		colored_text(domain .. message.text, message.color)
 	end
 	imgui.end_child()
 
